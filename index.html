@@ -368,7 +368,7 @@
         <div class="media-area">
           <strong style="color:#9d174d;">🖼️ 画像・音声を入れる（Base64）</strong>
           <div class="media-flex">
-            <input id="filePicker" type="file" accept="image/*,audio/*" />
+            <input id="filePicker" type="file" accept="image/*,audio/*,.m4a,.mp3,.wav,.aac,.ogg,.jpg,.jpeg,.png,.gif,.webp" />
             <button id="addFileBtn" type="button">追加</button>
           </div>
           <div id="fileNote" style="color:#64748b; margin-top:6px; font-size:0.78rem; font-weight:700;">
@@ -554,7 +554,7 @@
       reader.onload = () => {
         const tag = f.type.startsWith("image/")
           ? "\n<img src=\"" + reader.result + "\" style=\"max-width:100%;\" />\n"
-          : f.type.startsWith("audio/")
+          : f.type.startsWith("audio/") || /\.(m4a|mp3|wav|aac|ogg)$/i.test(f.name)
           ? "\n<audio controls src=\"" + reader.result + "\"></audio>\n"
           : "";
         if (!tag) {
