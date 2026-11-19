@@ -9,12 +9,14 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-      background: #f1f5f9;
-      color: #0f172a;
+      background: linear-gradient(180deg, #fff7ed 0%, #fdf2f8 50%, #eff6ff 100%);
+      min-height: 100vh;
+      color: #334155;
     }
     header {
-      background: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid #fbcfe8;
       padding: 12px 16px;
       display: flex;
       align-items: center;
@@ -23,10 +25,13 @@
       position: sticky;
       top: 0;
       z-index: 10;
+      box-shadow: 0 4px 16px rgba(244, 114, 182, 0.1);
     }
     .title-logo {
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 1.05rem;
+      color: #db2777;
+      letter-spacing: 0.02em;
     }
     .btn-row {
       display: flex;
@@ -34,40 +39,64 @@
       flex-wrap: wrap;
     }
     button, .link-btn {
-      border: 1px solid #cbd5e1;
+      border: 2px solid #f5d0fe;
       background: #ffffff;
-      color: #0f172a;
-      padding: 8px 12px;
-      border-radius: 10px;
+      color: #475569;
+      padding: 9px 14px;
+      border-radius: 999px;
       font-size: 0.85rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 3px 0 #f5d0fe;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+    button:hover, .link-btn:hover {
+      background: #fdf4ff;
+    }
+    button:active, .link-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #f5d0fe;
     }
     .btn-run {
-      background: #2563eb;
-      border-color: #2563eb;
+      background: #60a5fa;
+      border-color: #3b82f6;
       color: #ffffff;
+      box-shadow: 0 3px 0 #2563eb;
+    }
+    .btn-run:hover {
+      background: #3b82f6;
+    }
+    .btn-run:active {
+      box-shadow: 0 1px 0 #2563eb;
     }
     .btn-pub {
-      background: #059669;
-      border-color: #059669;
+      background: #34d399;
+      border-color: #10b981;
       color: #ffffff;
+      box-shadow: 0 3px 0 #059669;
+    }
+    .btn-pub:hover {
+      background: #10b981;
+    }
+    .btn-pub:active {
+      box-shadow: 0 1px 0 #059669;
     }
     .wrap {
       max-width: 1100px;
       margin: 14px auto;
-      padding: 0 12px 40px;
+      padding: 0 12px 44px;
     }
     .card {
       background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
+      border: 2px solid #fce7f3;
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(148, 163, 184, 0.14);
     }
     .tpl-list {
       display: flex;
@@ -75,21 +104,37 @@
       gap: 8px;
       align-items: center;
     }
+    .tplBtn {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #92400e;
+      box-shadow: 0 3px 0 #fcd34d;
+    }
+    .tplBtn:hover {
+      background: #fef3c7;
+    }
+    .tplBtn:active {
+      box-shadow: 0 1px 0 #fcd34d;
+    }
     .mode-switch {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
     .mode-switch button.active {
-      background: #2563eb;
-      border-color: #2563eb;
+      background: #f472b6;
+      border-color: #ec4899;
       color: #ffffff;
+      box-shadow: 0 3px 0 #db2777;
+    }
+    .mode-switch button.active:active {
+      box-shadow: 0 1px 0 #db2777;
     }
     .meta-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
       margin-bottom: 10px;
     }
     @media (max-width: 640px) {
@@ -99,29 +144,53 @@
     }
     .input-box {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
+      padding: 11px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
       font-size: 0.92rem;
       font-weight: 700;
+      background: #fffdfd;
+      color: #334155;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .input-box:focus {
+      border-color: #f472b6;
+      box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.18);
+    }
+    .ai-tip {
+      background: #fdf4ff;
+      border: 2px dashed #e879f9;
+      color: #86198f;
+      border-radius: 16px;
+      padding: 10px 13px;
+      font-size: 0.83rem;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 10px;
     }
     textarea.editor {
       width: 100%;
       height: 320px;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #1e293b;
-      background: #0f172a;
+      padding: 14px;
+      border-radius: 18px;
+      border: 2px solid #312e81;
+      background: #1e1b4b;
       color: #f8fafc;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       font-size: 0.86rem;
-      line-height: 1.5;
+      line-height: 1.55;
       resize: vertical;
+      outline: none;
+    }
+    textarea.editor:focus {
+      border-color: #a78bfa;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.25);
     }
     .media-area {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid #e2e8f0;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 2px dashed #fce7f3;
       font-size: 0.85rem;
     }
     .media-flex {
@@ -129,30 +198,33 @@
       gap: 8px;
       align-items: center;
       flex-wrap: wrap;
-      margin-top: 6px;
+      margin-top: 8px;
     }
     iframe.stage {
       width: 100%;
       height: 440px;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
+      border: 2px solid #fbcfe8;
+      border-radius: 18px;
       background: #ffffff;
     }
     .notice {
-      font-size: 0.85rem;
-      padding: 10px 12px;
-      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      padding: 11px 15px;
+      border-radius: 16px;
       background: #eff6ff;
-      color: #1e3a8a;
-      margin-bottom: 12px;
+      border: 2px solid #bfdbfe;
+      color: #1e40af;
+      margin-bottom: 14px;
     }
     .share-box {
       display: none;
       background: #ecfdf5;
-      border: 1px solid #6ee7b7;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
+      border: 2px solid #6ee7b7;
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.12);
     }
     .share-box.show { display: block; }
     .url-block {
@@ -161,16 +233,16 @@
     .url-label {
       display: block;
       font-size: 0.8rem;
-      font-weight: 700;
+      font-weight: 800;
       color: #065f46;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .url-warn {
       display: block;
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       color: #b45309;
-      margin-bottom: 4px;
-      font-weight: 700;
+      margin-bottom: 5px;
+      font-weight: 800;
     }
     .share-row {
       display: flex;
@@ -180,16 +252,17 @@
     .share-url {
       flex: 1;
       min-width: 200px;
-      padding: 9px 12px;
-      border-radius: 10px;
-      border: 1px solid #34d399;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 2px solid #6ee7b7;
       background: #ffffff;
       font-size: 0.86rem;
+      color: #334155;
     }
     /* 公開ページ（閲覧専用・編集不可） */
     .viewer-top {
       background: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 2px solid #fbcfe8;
       padding: 8px 14px;
       display: flex;
       align-items: center;
@@ -206,15 +279,15 @@
     }
     .viewer-author {
       font-size: 0.78rem;
-      color: #475569;
-      background: #f1f5f9;
-      padding: 2px 8px;
+      color: #9d174d;
+      background: #fce7f3;
+      padding: 3px 10px;
       border-radius: 999px;
-      font-weight: 700;
+      font-weight: 800;
     }
     .viewer-full {
       width: 100%;
-      height: calc(100vh - 50px);
+      height: calc(100vh - 54px);
       border: 0;
       display: block;
       background: #ffffff;
@@ -231,7 +304,7 @@
         <span id="vAuthor" class="viewer-author"></span>
       </div>
       <div class="btn-row">
-        <a id="vHomeLink" class="link-btn" href="./">誰プロで作る</a>
+        <a id="vHomeLink" class="link-btn btn-run" href="./">✨ 誰プロで作る</a>
       </div>
     </div>
     <iframe id="vFrame" class="viewer-full" sandbox="allow-scripts allow-forms allow-modals"></iframe>
@@ -240,7 +313,7 @@
   <!-- 作成・本人修正モード -->
   <div id="editorScreen" class="hide">
     <header>
-      <div class="title-logo" id="editorHeaderTitle">誰プロ</div>
+      <div class="title-logo" id="editorHeaderTitle">✨ 誰プロ</div>
       <div class="btn-row">
         <button id="runCodeBtn" type="button" class="btn-run">▶ 実行</button>
         <button id="publishCodeBtn" type="button" class="btn-pub">🚀 公開する</button>
@@ -272,14 +345,14 @@
       <div id="msgBox" class="notice">テンプレートを選ぶかコードを書いて「▶ 実行」を押してみよう！</div>
 
       <div class="card tpl-list">
-        <span style="font-size:0.82rem; font-weight:700; color:#64748b;">テンプレ：</span>
-        <button type="button" class="tplBtn" data-id="card">自己紹介</button>
-        <button type="button" class="tplBtn" data-id="luck">おみくじ</button>
-        <button type="button" class="tplBtn" data-id="tap">連打</button>
+        <span style="font-size:0.82rem; font-weight:800; color:#9d174d;">🌈 テンプレ：</span>
+        <button type="button" class="tplBtn" data-id="card">🌟 自己紹介</button>
+        <button type="button" class="tplBtn" data-id="luck">🎋 おみくじ</button>
+        <button type="button" class="tplBtn" data-id="tap">⚡ 連打</button>
       </div>
 
       <div class="mode-switch">
-        <button id="showEditTab" type="button" class="active">✏️ コードを書く</button>
+        <button id="showEditTab" type="button" class="active">✏️ コード編集</button>
         <button id="showViewTab" type="button">👀 プレビューを見る</button>
       </div>
 
@@ -288,14 +361,17 @@
           <input id="pageTitleInput" class="input-box" type="text" placeholder="ページのタイトル" />
           <input id="authorInput" class="input-box" type="text" placeholder="作った人（ニックネーム・任意）" />
         </div>
-        <textarea id="codeInput" class="editor" spellcheck="false"></textarea>
+        <div class="ai-tip">
+          💡 ヒント：ChatGPTやGeminiで作ったHTML/ゲームのコードをここに貼り付けて「▶ 実行」を押しても遊べるよ！
+        </div>
+        <textarea id="codeInput" class="editor" spellcheck="false" placeholder="ここにコードを書くか、ChatGPTやGeminiで作ったコードを貼ってみてね！"></textarea>
         <div class="media-area">
-          <strong>画像・音声を入れる（Base64）</strong>
+          <strong style="color:#9d174d;">🖼️ 画像・音声を入れる（Base64）</strong>
           <div class="media-flex">
             <input id="filePicker" type="file" accept="image/*,audio/*" />
             <button id="addFileBtn" type="button">追加</button>
           </div>
-          <div id="fileNote" style="color:#64748b; margin-top:4px; font-size:0.78rem;">
+          <div id="fileNote" style="color:#64748b; margin-top:6px; font-size:0.78rem; font-weight:700;">
             選んだファイルをコードに埋め込みます。
           </div>
         </div>
