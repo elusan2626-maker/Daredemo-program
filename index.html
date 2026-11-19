@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>誰でもプログラマー（誰プロ）🚀</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: 丸みがあって読みやすい日本語フォント -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background-color: #f8fafc;
+    }
+    .code-font {
+      font-family: 'Fira Code', monospace;
+    }
+    /* スクロールバー */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    /* ポップなボタンの押し心地 */
+    .pop-btn {
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s ease;
+    }
+    .pop-btn:active {
+      transform: scale(0.95);
+    }
+    /* トーストアニメーション */
+    @keyframes popIn {
+      0% { transform: translate(-50%, 30px) scale(0.9); opacity: 0; }
+      100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+    }
+    .toast-show {
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+  <!-- =========================================================
+       ビューアモード用コンテナ（共有URLで開かれたときに全画面表示）
+       ========================================================= -->
+  <div id="viewer-mode-container" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
+    <iframe id="viewer-iframe" class="w-full h-full border-0 flex-1" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
+    <!-- 右下に控えめな「誰プロで作られたページ」バッジ -->
+    <button onclick="exitViewerMode()" class="fixed bottom-4 right-4 bg-slate-900/85 hover:bg-slate-900 text-white text-xs font-bold px-3.5 py-2.5 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-1.5 transition pop-btn">
+      <span>✨ 誰プロで作られたページ（自分も作る）</span>
+    </button>
+  </div>
+
+  <!-- =========================================================
+       メインエディタ画面
+       ========================================================= -->
+  <div id="app-container" class="flex-1 flex flex-col max-w-4xl w-full mx-auto bg-white shadow-sm min-h-screen">
+    
+    <!-- ポップで親しみやすいヘッダー -->
+    <header class="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-500 text-white px-4 py-3.5 shadow-md sticky top-0 z-30">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <div class="bg-white text-blue-600 w-10 h-10 rounded-2xl shadow-sm flex items-center justify-center text-xl font-black shrink-0">
+            🚀
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <h1 class="font-black text-base sm:text-xl leading-tight tracking-tight">誰でもプログラマー</h1>
+              <span class="bg-amber-300 text-slate-900 text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full shadow-xs">
+                略して「誰プロ」🚀
+              </span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-sky-100 font-medium mt-0.5">
+              コピペやカンタン操作で、自分だけのWebページを作ろう！
+            </p>
+          </div>
+        </div>
+        <button onclick="downloadHtmlFile()" class="pop-btn bg-white text-blue-600 hover:bg-sky-50 font-extrabold text-xs px-3 py-2.5 rounded-2xl shadow-sm flex items-center gap-1 shrink-0">
+          <span>💾</span>
+          <span class="hidden sm:inline">HTMLを保存</span>
+          <span class="sm:hidden">保存</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 大きな3ステップ ナビゲーション -->
+    <nav class="grid grid-cols-3 bg-slate-100 p-1.5 gap-1.5 border-b border-slate-200 sticky top-[68px] z-20">
+      <button onclick="switchMainTab('editor')" id="tab-btn-editor" class="main-tab-btn py-2.5 px-1.5 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 transition bg-white text-blue-600 shadow-sm">
+        <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-black">STEP 1</span>
+        <span>✍️ コードを入れる</span>
+      </button>
+      <button onclick="switchMainTab('preview')" id="tab-btn-preview" class="main-tab-btn py-2.5 px-1.5 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 transition text-slate-600 hover:bg-white/60">
+        <span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-black">STEP 2</span>
+        <span>👀 画面を見る</span>
+      </button>
+      <button onclick="switchMainTab('publish')" id="tab-btn-publish" class="main-tab-btn py-2.5 px-1.5 rounded-2xl font-extrabold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 transition text-slate-600 hover:bg-white/60">
+        <span class="bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-[10px] font-black">STEP 3</span>
+        <span>🌐 みんなに見せる</span>
+      </button>
+    </nav>
+
+    <!-- =========================================================
+         STEP 1: コード・データを入れる
+         ========================================================= -->
+    <main id="panel-editor" class="flex-1 flex flex-col p-3.5 sm:p-5 gap-4">
+      
+      <!-- かんたんテンプレート（おためしボタン） -->
+      <div class="bg-amber-50/90 border-2 border-amber-200 rounded-3xl p-3.5 flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs sm:text-sm font-black text-amber-900 flex items-center gap-1.5">
+            <span>🎈 かんたんテンプレート（タップですぐ遊べる！）</span>
+          </span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button onclick="applyTemplate('profile')" class="pop-btn bg-white hover:bg-amber-100 border border-amber-300 text-slate-800 font-bold text-xs py-2.5 px-2 rounded-2xl shadow-2xs flex items-center justify-center gap-1">
+            <span>🪪 自己紹介カード</span>
+          </button>
+          <button onclick="applyTemplate('omikuji')" class="pop-btn bg-white hover:bg-amber-100 border border-amber-300 text-slate-800 font-bold text-xs py-2.5 px-2 rounded-2xl shadow-2xs flex items-center justify-center gap-1">
+            <span>⛩️ おみくじゲーム</span>
+          </button>
+          <button onclick="applyTemplate('clicker')" class="pop-btn bg-white hover:bg-amber-100 border border-amber-300 text-slate-800 font-bold text-xs py-2.5 px-2 rounded-2xl shadow-2xs flex items-center justify-center gap-1">
+            <span>🍪 連打クリッカー</span>
+          </button>
+          <button onclick="applyTemplate('blank')" class="pop-btn bg-white hover:bg-amber-100 border border-amber-300 text-slate-800 font-bold text-xs py-2.5 px-2 rounded-2xl shadow-2xs flex items-center justify-center gap-1">
+            <span>📄 まっさら（白紙）</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 入力スタイル切り替え -->
+      <div class="grid grid-cols-3 bg-slate-100 p-1.5 rounded-2xl gap-1">
+        <button onclick="switchEditorMode('single')" id="emode-single" class="emode-btn py-2.5 px-2 rounded-xl text-xs font-extrabold bg-slate-800 text-white shadow-sm transition">
+          📄 まるごと貼る
+        </button>
+        <button onclick="switchEditorMode('split')" id="emode-split" class="emode-btn py-2.5 px-2 rounded-xl text-xs font-extrabold text-slate-600 hover:bg-white transition">
+          🧩 パーツごと
+        </button>
+        <button onclick="switchEditorMode('data')" id="emode-data" class="emode-btn py-2.5 px-2 rounded-xl text-xs font-extrabold text-slate-600 hover:bg-white transition">
+          🖼️ データ・画像
+        </button>
+      </div>
+
+      <!-- スマホで便利な大きな操作ボタン -->
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="pasteFromClipboard()" class="pop-btn bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm py-3 px-2 rounded-2xl shadow-sm flex items-center justify-center gap-1">
+          <span>📋 貼り付け</span>
+        </button>
+        <button onclick="selectAllCode()" class="pop-btn bg-sky-500 hover:bg-sky-600 text-white font-extrabold text-xs sm:text-sm py-3 px-2 rounded-2xl shadow-sm flex items-center justify-center gap-1">
+          <span>📄 ぜんぶコピー</span>
+        </button>
+        <button onclick="openClearModal()" class="pop-btn bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs sm:text-sm py-3 px-2 rounded-2xl shadow-sm flex items-center justify-center gap-1">
+          <span>🗑️ クリア</span>
+        </button>
+      </div>
+
+      <!-- モード1: まるごと貼る（1ファイルHTML） -->
+      <div id="view-single" class="flex-1 flex flex-col gap-2">
+        <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+          <span class="font-bold">AI（GeminiやChatGPTなど）が作ったコードをそのまま貼ろう！</span>
+          <span id="char-count" class="font-mono bg-slate-100 px-2 py-0.5 rounded-full font-bold">0 文字</span>
+        </div>
+        <textarea id="code-single" oninput="handleCodeChange()" placeholder="ここにコードを貼り付けてね！&#10;上の「🎈 かんたんテンプレート」を押すと、すぐにサンプルが入るよ！" class="code-font flex-1 w-full min-h-[340px] sm:min-h-[420px] p-4 bg-slate-900 text-emerald-300 rounded-3xl border-2 border-slate-700 focus:border-sky-400 focus:outline-none text-xs sm:text-sm leading-relaxed shadow-inner resize-y"></textarea>
+      </div>
+
+      <!-- モード2: パーツごと（HTML / CSS / JS 分割） -->
+      <div id="view-split" class="hidden flex-1 flex flex-col gap-4">
+        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-3 text-xs text-sky-900 font-medium">
+          💡 3つに分けて書いても、プレビューや公開のときに自動で1つのWebページに合体するよ！
+        </div>
+        <div>
+          <label class="block text-xs font-extrabold text-slate-700 mb-1">🧱 HTML（文字やボタンなどの骨組み）</label>
+          <textarea id="code-html" oninput="handleCodeChange()" placeholder="<h1>こんにちは！</h1>&#10;<button id='btn'>おしてね！</button>" class="code-font w-full h-36 p-3.5 bg-slate-900 text-sky-300 rounded-2xl border border-slate-700 focus:border-sky-400 focus:outline-none text-xs leading-relaxed"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-extrabold text-slate-700 mb-1">🎨 CSS（色や大きさなどのデザイン）</label>
+          <textarea id="code-css" oninput="handleCodeChange()" placeholder="body { text-align: center; padding: 20px; }&#10;button { background: #0ea5e9; color: white; padding: 12px 24px; border-radius: 99px; border: none; font-size: 16px; }" class="code-font w-full h-32 p-3.5 bg-slate-900 text-pink-300 rounded-2xl border border-slate-700 focus:border-sky-400 focus:outline-none text-xs leading-relaxed"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-extrabold text-slate-700 mb-1">⚡ JavaScript（ボタンを押したときの動き）</label>
+          <textarea id="code-js" oninput="handleCodeChange()" placeholder="document.getElementById('btn').onclick = () => {&#10;  document.querySelector('h1').textContent = 'やったー！動いたよ！🎉';&#10;};" class="code-font w-full h-32 p-3.5 bg-slate-900 text-amber-300 rounded-2xl border border-slate-700 focus:border-sky-400 focus:outline-none text-xs leading-relaxed"></textarea>
+        </div>
+      </div>
+
+      <!-- モード3: データ・画像を入れる -->
+      <div id="view-data" class="hidden flex-1 flex flex-col gap-5">
+        <!-- JSON / テキストデータ埋め込み -->
+        <div class="bg-white border-2 border-slate-200 rounded-3xl p-4 shadow-2xs flex flex-col gap-2.5">
+          <div class="flex items-center justify-between">
+            <h3 class="font-black text-sm text-slate-800">📊 データを入れる（JSON・リスト・文章）</h3>
+            <span class="text-[10px] bg-indigo-100 text-indigo-700 font-black px-2.5 py-0.5 rounded-full">自動で使える！</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            クイズの問題やアイテムリストなどのデータをここに貼ると、プログラムの中から <code class="bg-slate-100 px-1.5 py-0.5 rounded text-pink-600 font-bold">window.APP_DATA</code> という名前でいつでも呼び出せるよ！
+          </p>
+          <textarea id="code-data" oninput="handleCodeChange()" placeholder='例：&#10;[&#10;  { "question": "日本の首都は？", "answer": "東京" },&#10;  { "question": "1 + 1 は？", "answer": "2" }&#10;]' class="code-font w-full h-40 p-3.5 bg-slate-900 text-amber-200 rounded-2xl border border-slate-700 focus:border-sky-400 focus:outline-none text-xs leading-relaxed"></textarea>
+        </div>
+
+        <!-- 画像・音声ファイルのBase64データURL変換 -->
+        <div class="bg-white border-2 border-slate-200 rounded-3xl p-4 shadow-2xs flex flex-col gap-3">
+          <h3 class="font-black text-sm text-slate-800">🖼️ 写真・イラスト・音をコード用文字に変換</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            スマホの写真やイラスト、効果音を選ぶと、HTMLの中にそのまま貼り付けられる特別な文字（データURL）に変身させるよ！
+          </p>
+          <label class="pop-btn cursor-pointer bg-sky-50 hover:bg-sky-100 border-2 border-dashed border-sky-300 rounded-2xl p-5 text-center transition flex flex-col items-center justify-center gap-1.5">
+            <span class="text-3xl">📁</span>
+            <span class="text-xs sm:text-sm font-black text-sky-800">ここをタップして画像や音を選ぶ</span>
+            <span class="text-[11px] text-slate-500">※軽い画像（100KBくらいまで）がおすすめ！</span>
+            <input type="file" accept="image/*,audio/*" onchange="convertFileToBase64(event)" class="hidden">
+          </label>
+
+          <div id="base64-result-box" class="hidden flex flex-col gap-2.5 bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-emerald-800">✨ 変換できたよ！ボタンでコピーしてね</span>
+              <span id="base64-size-info" class="text-[11px] font-bold text-slate-500"></span>
+            </div>
+            <input type="text" id="base64-output" readonly class="code-font w-full p-2.5 bg-white border border-emerald-300 rounded-xl text-xs text-slate-600">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button onclick="copyBase64('raw')" class="pop-btn bg-slate-800 text-white text-xs font-extrabold py-2.5 px-2 rounded-xl">
+                📋 文字だけコピー
+              </button>
+              <button onclick="copyBase64('img')" class="pop-btn bg-blue-600 text-white text-xs font-extrabold py-2.5 px-2 rounded-xl">
+                🖼️ 画像タグでコピー
+              </button>
+              <button onclick="insertBase64ToEditor()" class="pop-btn bg-emerald-600 text-white text-xs font-extrabold py-2.5 px-2 rounded-xl">
+                ➕ コードに直接入れる
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下部アクション：次へ進む -->
+      <div class="pt-1">
+        <button onclick="switchMainTab('preview')" class="pop-btn w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm sm:text-base">
+          <span>👀 できた画面を見てみる！</span>
+          <span>→</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- =========================================================
+         STEP 2: 画面を見る（プレビュー）
+         ========================================================= -->
+    <section id="panel-preview" class="hidden flex-1 flex flex-col p-3.5 sm:p-5 gap-3 bg-slate-100">
+      <!-- プレビュー切り替えバー -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-white p-2.5 rounded-2xl shadow-xs border border-slate-200">
+        <div class="flex items-center gap-1.5">
+          <button onclick="setPreviewDevice('mobile')" id="dev-mobile" class="pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-blue-600 text-white flex items-center gap-1">
+            <span>📱 スマホサイズ</span>
+          </button>
+          <button onclick="setPreviewDevice('desktop')" id="dev-desktop" class="pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-1">
+            <span>💻 パソコン・ひろめ</span>
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="refreshPreview()" class="pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200">
+            🔄 やりなおし
+          </button>
+          <button onclick="openFullscreenPreview()" class="pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-indigo-600 text-white hover:bg-indigo-700">
+            🔍 全画面でためす
+          </button>
+        </div>
+      </div>
+
+      <!-- プレビュー表示枠 -->
+      <div class="flex-1 flex items-center justify-center bg-slate-200/70 rounded-3xl p-2 sm:p-4 overflow-hidden min-h-[460px]">
+        <div id="preview-frame-wrapper" class="w-full max-w-[390px] h-[640px] bg-white rounded-[32px] shadow-xl border-[6px] border-slate-800 overflow-hidden transition-all duration-300 flex flex-col">
+          <iframe id="preview-iframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
+        </div>
+      </div>
+
+      <!-- 下部アクション -->
+      <div class="grid grid-cols-2 gap-2.5">
+        <button onclick="switchMainTab('editor')" class="pop-btn bg-white border-2 border-slate-300 text-slate-700 font-extrabold py-3.5 rounded-2xl text-xs sm:text-sm hover:bg-slate-50">
+          ← コードをなおす
+        </button>
+        <button onclick="switchMainTab('publish')" class="pop-btn bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3.5 rounded-2xl shadow-md text-xs sm:text-sm">
+          🌐 みんなに見せる →
+        </button>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         STEP 3: みんなに見せる（URL発行・Web公開）
+         ========================================================= -->
+    <section id="panel-publish" class="hidden flex-1 flex flex-col p-3.5 sm:p-5 gap-5">
+      
+      <!-- 方法A：サクッと共有URLを作る（登録なし） -->
+      <div class="bg-gradient-to-br from-sky-50 to-indigo-50 border-2 border-sky-200 rounded-3xl p-4 sm:p-5 shadow-xs flex flex-col gap-3.5">
+        <div>
+          <span class="inline-block bg-sky-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full mb-1">アカウント登録なし・すぐできる！</span>
+          <h2 class="font-black text-base sm:text-lg text-slate-800">方法A：サクッと共有URLを作る</h2>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          作ったWebページのデータをギュッと小さく圧縮して、そのままURLにします！<br>
+          できあがったURLをLINEやSNSで友だちに送るだけで、友だちのスマホでも作ったページが開くよ！
+        </p>
+
+        <button onclick="generateInstantShareUrl()" class="pop-btn w-full bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-black py-4 px-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm sm:text-base">
+          <span>🔗 共有用URLを作る！</span>
+        </button>
+
+        <!-- URL生成結果 -->
+        <div id="instant-url-result" class="hidden flex flex-col gap-2.5 bg-white p-3.5 rounded-2xl border-2 border-sky-200">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-emerald-700">🎉 共有URLができたよ！</span>
+            <span id="instant-url-length" class="text-[11px] font-bold text-slate-500"></span>
+          </div>
+          <input type="text" id="instant-share-url-input" readonly class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded-xl text-xs text-slate-700 code-font">
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="copyInstantUrl()" class="pop-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs py-3 rounded-xl">
+              📋 URLをコピー
+            </button>
+            <button onclick="testInstantUrl()" class="pop-btn bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs py-3 rounded-xl">
+              🚀 実際の画面を開く
+            </button>
+          </div>
+          <!-- 仮プレビュー環境（blob: や about:srcdoc）のときのわかりやすい案内 -->
+          <div id="sandbox-warning" class="hidden text-xs text-amber-900 bg-amber-50 p-3 rounded-2xl border border-amber-300 leading-relaxed">
+            <strong>💡 ちょっとメモ：</strong><br>
+            いま「仮のプレビュー画面」の中で動かしているため、このURLをメモ帳などに貼っても外からは開けません。<br>
+            下の<strong>「💾 index.htmlを保存する」</strong>または<strong>「方法B：GitHubで本格公開」</strong>を使って、この「誰プロ」自体を一度Web上に置くと、そこからは発行した共有URLがどこでも開けるようになるよ！
+          </div>
+        </div>
+      </div>
+
+      <!-- 方法B：GitHubで本格公開（全自動ガイド） -->
+      <div class="bg-white border-2 border-slate-200 rounded-3xl p-4 sm:p-5 shadow-xs flex flex-col gap-4">
+        <div>
+          <span class="inline-block bg-emerald-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full mb-1">短い正式なWebサイトURLが欲しいとき</span>
+          <h2 class="font-black text-base sm:text-lg text-slate-800">方法B：GitHubで本格公開（全自動ガイド）</h2>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            英語のサイトでむずかしい操作をしなくても大丈夫！最初に1回だけ「合言葉（トークン）」を登録すれば、あとは日本語画面でボタンを押すだけで全自動でWebサイトが公開されるよ！
+          </p>
+        </div>
+
+        <!-- 初回設定：トークン登録 -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+              <span>🔑 1. 合言葉（トークン）を登録</span>
+              <span id="gh-token-status" class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-bold">未登録</span>
+            </span>
+            <button onclick="toggleTokenGuide()" class="text-xs font-extrabold text-blue-600 underline">
+              とりかたを見る
+            </button>
+          </div>
+
+          <!-- 初心者向けステップガイド -->
+          <div id="gh-token-guide" class="hidden bg-white border border-blue-200 rounded-2xl p-3.5 text-xs text-slate-700 flex flex-col gap-2">
+            <p class="font-black text-blue-800">📖 合言葉（トークン）のとりかた（無料・3ステップ）</p>
+            <ol class="list-decimal list-inside space-y-1.5 text-[11px] leading-relaxed">
+              <li>GitHubにログインした状態で、<a href="https://github.com/settings/tokens/new?description=DarePro&scopes=repo" target="_blank" rel="noopener" class="text-blue-600 font-extrabold underline">こちらの専用リンク</a> を開きます（必要なチェックは自動で入っています）。</li>
+              <li>画面の一番下にある緑色のボタン <strong>「Generate token」</strong> を押します。</li>
+              <li>画面に出た <code class="bg-slate-100 px-1 rounded">ghp_...</code> から始まる英数字をコピーして、下の枠に貼り付けて「保存」を押せば準備完了！</li>
+            </ol>
+          </div>
+
+          <div class="flex gap-2">
+            <input type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" class="flex-1 p-2.5 bg-white border border-slate-300 rounded-xl text-xs code-font focus:border-blue-500 focus:outline-none">
+            <button onclick="saveGithubToken()" class="pop-btn bg-slate-800 hover:bg-slate-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl">
+              保存
+            </button>
+          </div>
+        </div>
+
+        <!-- ページ名入力＆公開ボタン -->
+        <div class="flex flex-col gap-3">
+          <div>
+            <label class="block text-xs font-extrabold text-slate-700 mb-1">
+              🏷️ 2. ページの名前をきめる（半角の英語・数字・ハイフン）
+            </label>
+            <input type="text" id="gh-repo-name" placeholder="例: my-game" class="w-full p-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm code-font focus:border-blue-500 focus:outline-none">
+            <p class="text-[11px] text-slate-500 mt-1">※この名前がそのままWebサイトのURLに入るよ！</p>
+          </div>
+
+          <button onclick="publishToGithubPages()" id="gh-publish-btn" class="pop-btn w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 px-4 rounded-2xl shadow-md flex items-center justify-center gap-2 text-sm sm:text-base">
+            <span>🚀 Webに公開する！</span>
+          </button>
+
+          <!-- 公開ステータス＆結果 -->
+          <div id="gh-status-box" class="hidden p-3.5 rounded-2xl border text-xs flex flex-col gap-2">
+            <div id="gh-status-message" class="font-extrabold"></div>
+            <div id="gh-published-url-box" class="hidden flex flex-col gap-2 mt-1">
+              <input type="text" id="gh-published-url" readonly class="w-full p-2.5 bg-white border border-emerald-300 rounded-xl text-xs code-font text-emerald-900">
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="copyGithubUrl()" class="pop-btn bg-emerald-700 text-white font-extrabold py-2.5 rounded-xl">
+                  📋 URLをコピー
+                </button>
+                <a id="gh-open-link" href="#" target="_blank" rel="noopener" class="pop-btn bg-white border-2 border-emerald-600 text-emerald-700 font-extrabold py-2.5 rounded-xl text-center">
+                  🌐 サイトを開く
+                </a>
+              </div>
+              <p class="text-[11px] text-slate-600">※はじめて公開したときは、画面が表示されるまで1〜2分くらいかかることがあるよ。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTMLファイル直接ダウンロードボタン -->
+        <div class="pt-2 border-t border-slate-200 flex flex-col gap-2">
+          <p class="text-xs font-bold text-slate-600">自分のスマホやパソコンにファイルとして保存したいとき：</p>
+          <button onclick="downloadHtmlFile()" class="pop-btn w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold py-3 px-4 rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-1.5">
+            <span>💾 index.html を保存する</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- =========================================================
+       全画面テストモーダル（STEP 2）
+       ========================================================= -->
+  <div id="fullscreen-preview-modal" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
+    <div class="bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between">
+      <span class="text-xs font-extrabold">🔍 全画面でためし中</span>
+      <button onclick="closeFullscreenPreview()" class="pop-btn bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-xl">
+        ✕ とじる
+      </button>
+    </div>
+    <iframe id="fullscreen-iframe" class="w-full flex-1 border-0" sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"></iframe>
+  </div>
+
+  <!-- =========================================================
+       クリア確認カスタムモーダル
+       ========================================================= -->
+  <div id="clear-confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl flex flex-col gap-4">
+      <h3 class="font-black text-base text-slate-800">🗑️ ぜんぶ空っぽにしてもいい？</h3>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        いま入っているコードやデータがすべて消えます。よろしいですか？
+      </p>
+      <div class="grid grid-cols-2 gap-2.5">
+        <button onclick="closeClearModal()" class="pop-btn bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3 rounded-2xl text-xs">
+          やめる
+        </button>
+        <button onclick="confirmClearAll()" class="pop-btn bg-rose-600 hover:bg-rose-700 text-white font-extrabold py-3 rounded-2xl text-xs">
+          はい、消す！
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       トースト通知
+       ========================================================= -->
+  <div id="toast-notification" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-extrabold px-5 py-3 rounded-full shadow-xl flex items-center gap-2 whitespace-nowrap">
+    <span id="toast-message">メッセージ</span>
+  </div>
+
+  <!-- =========================================================
+       JavaScript ロジック（外部ライブラリ不要・完全自己完結）
+       ========================================================= -->
+  <script>
+    let currentEditorMode = 'single';
+    let lastBase64DataUrl = '';
+
+    // ---------------------------------------------------------
+    // 1. 起動時の初期化（ビューアモード判定・作業内容の復元）
+    // ---------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', async () => {
+      // 共有URL（#view=...）で開かれたかチェック
+      const isViewer = await checkAndLaunchViewerMode();
+      if (isViewer) return;
+
+      // 前回の入力内容を復元（初回は自己紹介カードをセット）
+      restoreSavedWork();
+
+      // GitHubトークン状態の確認
+      const savedToken = localStorage.getItem('darepro_gh_token');
+      if (savedToken) {
+        document.getElementById('gh-token-input').value = savedToken;
+        updateTokenStatusBadge(true);
+      }
+
+      updateCharCount();
+    });
+
+    // ---------------------------------------------------------
+    // 2. 圧縮・解凍ユーティリティ（CompressionStream + Base64URL）
+    // ---------------------------------------------------------
+    async function compressStringToBase64Url(str) {
+      const encoder = new TextEncoder();
+      const inputBytes = encoder.encode(str);
+
+      if (typeof CompressionStream !== 'undefined') {
+        const cs = new CompressionStream('gzip');
+        const writer = cs.writable.getWriter();
+        writer.write(inputBytes);
+        writer.close();
+        const compressedBuffer = await new Response(cs.readable).arrayBuffer();
+        return bytesToBase64Url(new Uint8Array(compressedBuffer));
+      } else {
+        // フォールバック（非圧縮UTF-8 Base64URL）
+        return bytesToBase64Url(inputBytes);
+      }
+    }
+
+    async function decompressBase64UrlToString(b64url) {
+      const bytes = base64UrlToBytes(b64url);
+      // gzipマジックナンバー (0x1f, 0x8b) をチェック
+      if (bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b && typeof DecompressionStream !== 'undefined') {
+        const ds = new DecompressionStream('gzip');
+        const writer = ds.writable.getWriter();
+        writer.write(bytes);
+        writer.close();
+        const decompressedBuffer = await new Response(ds.readable).arrayBuffer();
+        return new TextDecoder().decode(decompressedBuffer);
+      } else {
+        return new TextDecoder().decode(bytes);
+      }
+    }
+
+    function bytesToBase64Url(bytes) {
+      let binary = '';
+      const chunkSize = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+      }
+      return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function base64UrlToBytes(b64url) {
+      let b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      const binary = atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes;
+    }
+
+    // ---------------------------------------------------------
+    // 3. ビューアモード判定＆起動
+    // ---------------------------------------------------------
+    async function checkAndLaunchViewerMode() {
+      let encodedData = null;
+
+      if (window.location.hash && window.location.hash.startsWith('#view=')) {
+        encodedData = window.location.hash.substring(6);
+      } else {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('view')) {
+          encodedData = params.get('view');
+        }
+      }
+
+      if (encodedData) {
+        try {
+          const html = await decompressBase64UrlToString(encodedData);
+          if (html) {
+            document.getElementById('app-container').classList.add('hidden');
+            const viewerContainer = document.getElementById('viewer-mode-container');
+            viewerContainer.classList.remove('hidden');
+            document.getElementById('viewer-iframe').srcdoc = html;
+            return true;
+          }
+        } catch (e) {
+          console.error('URLデータの展開に失敗:', e);
+        }
+      }
+      return false;
+    }
+
+    function exitViewerMode() {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      document.getElementById('viewer-mode-container').classList.add('hidden');
+      document.getElementById('app-container').classList.remove('hidden');
+      showToast('「誰プロ」のエディタ画面に切り替えたよ！');
+    }
+
+    // ---------------------------------------------------------
+    // 4. かんたんテンプレート集（子供・初心者向け）
+    // ---------------------------------------------------------
+    const TEMPLATES = {
+      profile: `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>わたしの自己紹介カード</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-gradient-to-br from-sky-100 via-indigo-100 to-pink-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl shadow-xl p-6 max-w-sm w-full text-center border-4 border-sky-300">
+    <div class="w-24 h-24 mx-auto bg-amber-100 rounded-full flex items-center justify-center text-5xl shadow-inner mb-3">
+      🐶
+    </div>
+    <span class="bg-sky-500 text-white text-xs font-bold px-3 py-1 rounded-full">よろしくね！</span>
+    <h1 class="text-2xl font-black text-slate-800 mt-2">なまえ：ゆうた</h1>
+    <p class="text-sm text-slate-500 mt-1">好きなこと：ゲーム・お絵かき・プログラミング</p>
+    
+    <div class="bg-slate-50 rounded-2xl p-4 mt-4 text-left text-xs space-y-2 border border-slate-200">
+      <p><strong>🍎 好きな食べ物：</strong>カレーライスとイチゴ</p>
+      <p><strong>⭐ マイブーム：</strong>「誰プロ」でミニゲームを作ること！</p>
+    </div>
+
+    <button onclick="sayHello()" class="mt-5 w-full bg-pink-500 hover:bg-pink-600 active:scale-95 text-white font-bold py-3.5 rounded-2xl shadow-md transition">
+      💖 いいね！をおす（<span id="like-count">0</span>）
+    </button>
+  </div>
+
+  <script>
+    let likes = 0;
+    function sayHello() {
+      likes++;
+      document.getElementById('like-count').textContent = likes;
+    }
+  <\/script>
+</body>
+</html>`,
+
+      omikuji: `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>わくわくおみくじ</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-gradient-to-b from-amber-100 to-orange-200 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl shadow-xl p-7 max-w-sm w-full text-center border-4 border-amber-400">
+    <div class="text-5xl mb-2">⛩️</div>
+    <h1 class="text-2xl font-black text-slate-800">今日の運勢おみくじ</h1>
+    <p class="text-xs text-slate-500 mt-1 mb-5">ボタンを押して今日の運勢を占おう！</p>
+    
+    <div class="bg-amber-50 rounded-2xl p-6 mb-5 border-2 border-amber-200 min-h-[130px] flex flex-col items-center justify-center">
+      <div id="fortune" class="text-3xl font-black text-rose-600">？？？</div>
+      <p id="message" class="text-xs font-bold text-slate-600 mt-2">なにが出るかな？</p>
+    </div>
+
+    <button onclick="draw()" class="w-full bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-black py-4 rounded-2xl shadow-lg transition text-base">
+      🎲 おみくじを引く！
+    </button>
+  </div>
+
+  <script>
+    const list = [
+      { title: "超大吉 🎉", msg: "最高の一日！なんでもうまくいくよ！" },
+      { title: "大吉 ✨", msg: "元気いっぱい！楽しいことが起きそう！" },
+      { title: "中吉 🍀", msg: "おやつを食べるとさらに運気アップ！" },
+      { title: "小吉 🌸", msg: "友だちにやさしくすると良いことあるかも！" }
+    ];
+    function draw() {
+      const item = list[Math.floor(Math.random() * list.length)];
+      document.getElementById('fortune').textContent = item.title;
+      document.getElementById('message').textContent = item.msg;
+    }
+  <\/script>
+</body>
+</html>`,
+
+      clicker: `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>クッキー連打ゲーム</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-gradient-to-b from-yellow-100 to-amber-200 min-h-screen flex items-center justify-center p-4 select-none">
+  <div class="bg-white rounded-3xl shadow-xl p-6 max-w-sm w-full text-center border-4 border-amber-300">
+    <h1 class="text-xl font-black text-amber-900">🍪 クッキー連打クリッカー</h1>
+    <p class="text-xs text-slate-500 mt-1">クッキーをタップしてたくさん増やそう！</p>
+
+    <div class="my-5 bg-amber-50 rounded-2xl py-3 px-4 border border-amber-200">
+      <div class="text-xs font-bold text-amber-700">いまのクッキー</div>
+      <div class="text-4xl font-black text-amber-600 mt-1"><span id="score">0</span> 枚</div>
+      <div id="rank" class="text-xs font-bold text-rose-500 mt-1">ランク：見習いパティシエ</div>
+    </div>
+
+    <button onclick="tapCookie()" class="w-40 h-40 mx-auto bg-amber-100 hover:bg-amber-200 active:scale-90 rounded-full shadow-lg border-4 border-amber-400 flex items-center justify-center text-7xl transition cursor-pointer">
+      🍪
+    </button>
+
+    <button onclick="upgrade()" id="up-btn" class="mt-6 w-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold py-3 rounded-2xl shadow text-xs">
+      ⚡ パワーアップ（必要：10枚）
+    </button>
+  </div>
+
+  <script>
+    let score = 0;
+    let power = 1;
+    let cost = 10;
+
+    function tapCookie() {
+      score += power;
+      updateUI();
+    }
+
+    function upgrade() {
+      if (score >= cost) {
+        score -= cost;
+        power += 1;
+        cost = Math.floor(cost * 1.6);
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      document.getElementById('score').textContent = score;
+      document.getElementById('up-btn').textContent = '⚡ パワーアップ（いま+' + power + '枚 / 必要:' + cost + '枚）';
+      const rankEl = document.getElementById('rank');
+      if (score >= 100) rankEl.textContent = 'ランク：伝説のクッキー王 👑';
+      else if (score >= 30) rankEl.textContent = 'ランク：一人前パティシエ ✨';
+    }
+  <\/script>
+</body>
+</html>`,
+
+      blank: `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マイWebページ</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+  <h1>こんにちは！</h1>
+  <p>ここから自由にWebページを作ろう！</p>
+</body>
+</html>`
+    };
+
+    function applyTemplate(key) {
+      const code = TEMPLATES[key];
+      if (!code) return;
+      switchEditorMode('single');
+      document.getElementById('code-single').value = code;
+      handleCodeChange();
+      const names = {
+        profile: '自己紹介カード',
+        omikuji: 'おみくじゲーム',
+        clicker: '連打クリッカー',
+        blank: 'まっさら（白紙）'
+      };
+      showToast(`「${names[key]}」を入れたよ！「👀 画面を見る」で確認しよう！`);
+    }
+
+    // ---------------------------------------------------------
+    // 5. 完成HTMLの組み立て
+    // ---------------------------------------------------------
+    function buildFinalHtml() {
+      const rawData = document.getElementById('code-data').value.trim();
+      let dataScript = '';
+
+      if (rawData) {
+        try {
+          const parsed = JSON.parse(rawData);
+          dataScript = `<script>window.APP_DATA = ${JSON.stringify(parsed)};<\/script>`;
+        } catch (e) {
+          dataScript = `<script>window.APP_DATA = ${JSON.stringify(rawData)};<\/script>`;
+        }
+      }
+
+      if (currentEditorMode === 'split') {
+        const htmlPart = document.getElementById('code-html').value;
+        const cssPart = document.getElementById('code-css').value;
+        const jsPart = document.getElementById('code-js').value;
+
+        return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>誰プロで作ったWebページ</title>
+  <style>
+${cssPart}
+  </style>
+  ${dataScript}
+</head>
+<body>
+${htmlPart}
+  <script>
+${jsPart}
+  <\/script>
+</body>
+</html>`;
+      } else {
+        let singleCode = document.getElementById('code-single').value;
+        if (!singleCode.trim()) {
+          return `<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;color:#64748b;text-align:center;padding:20px;"><div><p style="font-size:20px;font-weight:bold;">まだコードが入っていないよ！</p><p style="font-size:13px;">STEP 1にもどってテンプレートを選ぶかコードを貼ってね</p></div></body></html>`;
+        }
+
+        if (rawData && singleCode.includes('{{APP_DATA}}')) {
+          singleCode = singleCode.replace(/\{\{APP_DATA\}\}/g, rawData);
+        }
+
+        if (dataScript) {
+          if (singleCode.includes('</head>')) {
+            singleCode = singleCode.replace('</head>', `${dataScript}\n</head>`);
+          } else {
+            singleCode = `${dataScript}\n${singleCode}`;
+          }
+        }
+        return singleCode;
+      }
+    }
+
+    // ---------------------------------------------------------
+    // 6. タブ切り替え・自動保存
+    // ---------------------------------------------------------
+    function switchMainTab(tabName) {
+      ['editor', 'preview', 'publish'].forEach(name => {
+        const panel = document.getElementById(`panel-${name}`);
+        const btn = document.getElementById(`tab-btn-${name}`);
+        const badge = btn.querySelector('span:first-child');
+        if (name === tabName) {
+          panel.classList.remove('hidden');
+          btn.classList.add('bg-white', 'text-blue-600', 'shadow-sm');
+          btn.classList.remove('text-slate-600');
+          badge.classList.replace('bg-slate-200', 'bg-blue-100');
+          badge.classList.replace('text-slate-600', 'text-blue-700');
+        } else {
+          panel.classList.add('hidden');
+          btn.classList.remove('bg-white', 'text-blue-600', 'shadow-sm');
+          btn.classList.add('text-slate-600');
+          badge.classList.replace('bg-blue-100', 'bg-slate-200');
+          badge.classList.replace('text-blue-700', 'text-slate-600');
+        }
+      });
+
+      if (tabName === 'preview') {
+        refreshPreview();
+      }
+    }
+
+    function switchEditorMode(mode) {
+      if (mode === 'single' || mode === 'split') {
+        currentEditorMode = mode;
+      }
+      ['single', 'split', 'data'].forEach(m => {
+        const view = document.getElementById(`view-${m}`);
+        const btn = document.getElementById(`emode-${m}`);
+        if (m === mode) {
+          view.classList.remove('hidden');
+          btn.classList.add('bg-slate-800', 'text-white', 'shadow-sm');
+          btn.classList.remove('text-slate-600');
+        } else {
+          view.classList.add('hidden');
+          btn.classList.remove('bg-slate-800', 'text-white', 'shadow-sm');
+          btn.classList.add('text-slate-600');
+        }
+      });
+    }
+
+    function handleCodeChange() {
+      updateCharCount();
+      try {
+        localStorage.setItem('darepro_single', document.getElementById('code-single').value);
+        localStorage.setItem('darepro_html', document.getElementById('code-html').value);
+        localStorage.setItem('darepro_css', document.getElementById('code-css').value);
+        localStorage.setItem('darepro_js', document.getElementById('code-js').value);
+        localStorage.setItem('darepro_data', document.getElementById('code-data').value);
+      } catch (e) {}
+    }
+
+    function restoreSavedWork() {
+      const s = localStorage.getItem('darepro_single');
+      const h = localStorage.getItem('darepro_html');
+      const c = localStorage.getItem('darepro_css');
+      const j = localStorage.getItem('darepro_js');
+      const d = localStorage.getItem('darepro_data');
+
+      if (s === null && h === null) {
+        // 初回アクセス時は自己紹介カードをセットしておくとすぐ試せる
+        document.getElementById('code-single').value = TEMPLATES.profile;
+      } else {
+        if (s !== null) document.getElementById('code-single').value = s;
+        if (h !== null) document.getElementById('code-html').value = h;
+        if (c !== null) document.getElementById('code-css').value = c;
+        if (j !== null) document.getElementById('code-js').value = j;
+        if (d !== null) document.getElementById('code-data').value = d;
+      }
+    }
+
+    function updateCharCount() {
+      const len = document.getElementById('code-single').value.length;
+      document.getElementById('char-count').textContent = `${len.toLocaleString()} 文字`;
+    }
+
+    // ---------------------------------------------------------
+    // 7. コピペ＆クリア補助
+    // ---------------------------------------------------------
+    function getActiveTextarea() {
+      if (!document.getElementById('view-single').classList.contains('hidden')) {
+        return document.getElementById('code-single');
+      }
+      if (!document.getElementById('view-data').classList.contains('hidden')) {
+        return document.getElementById('code-data');
+      }
+      return document.getElementById('code-html');
+    }
+
+    async function pasteFromClipboard() {
+      const target = getActiveTextarea();
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text) {
+            target.value = text;
+            handleCodeChange();
+            showToast('📋 貼り付けたよ！');
+            return;
+          }
+        }
+        target.focus();
+        showToast('入力枠をタップして「ペースト」を押してね！');
+      } catch (err) {
+        target.focus();
+        showToast('入力枠を長押しして「ペースト」を押してね！');
+      }
+    }
+
+    function selectAllCode() {
+      const target = getActiveTextarea();
+      target.focus();
+      target.select();
+      target.setSelectionRange(0, 999999);
+      try {
+        document.execCommand('copy');
+        showToast('📄 ぜんぶコピーしたよ！');
+      } catch (e) {
+        showToast('ぜんぶ選択したよ！');
+      }
+    }
+
+    function openClearModal() {
+      document.getElementById('clear-confirm-modal').classList.remove('hidden');
+    }
+
+    function closeClearModal() {
+      document.getElementById('clear-confirm-modal').classList.add('hidden');
+    }
+
+    function confirmClearAll() {
+      document.getElementById('code-single').value = '';
+      document.getElementById('code-html').value = '';
+      document.getElementById('code-css').value = '';
+      document.getElementById('code-js').value = '';
+      document.getElementById('code-data').value = '';
+      handleCodeChange();
+      closeClearModal();
+      showToast('🗑️ 空っぽにしたよ！');
+    }
+
+    // ---------------------------------------------------------
+    // 8. 画像・音声ファイルのBase64データURL変換
+    // ---------------------------------------------------------
+    function convertFileToBase64(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        lastBase64DataUrl = e.target.result;
+        document.getElementById('base64-output').value = lastBase64DataUrl;
+        const sizeKb = Math.round(file.size / 1024);
+        document.getElementById('base64-size-info').textContent = `大きさ: 約${sizeKb}KB`;
+        document.getElementById('base64-result-box').classList.remove('hidden');
+        showToast('✨ 変換できたよ！');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function copyBase64(type) {
+      if (!lastBase64DataUrl) return;
+      const textToCopy = type === 'img'
+        ? `<img src="${lastBase64DataUrl}" alt="画像" style="max-width:100%;height:auto;">`
+        : lastBase64DataUrl;
+      copyTextToClipboard(textToCopy);
+      showToast(type === 'img' ? '🖼️ 画像タグをコピーしたよ！' : '📋 データURLをコピーしたよ！');
+    }
+
+    function insertBase64ToEditor() {
+      if (!lastBase64DataUrl) return;
+      const tag = lastBase64DataUrl.startsWith('data:audio')
+        ? `\n<audio controls src="${lastBase64DataUrl}"></audio>\n`
+        : `\n<img src="${lastBase64DataUrl}" alt="画像" style="max-width:100%;height:auto;">\n`;
+
+      if (currentEditorMode === 'split') {
+        const htmlBox = document.getElementById('code-html');
+        htmlBox.value += tag;
+      } else {
+        const singleBox = document.getElementById('code-single');
+        if (singleBox.value.includes('</body>')) {
+          singleBox.value = singleBox.value.replace('</body>', `${tag}</body>`);
+        } else {
+          singleBox.value += tag;
+        }
+      }
+      handleCodeChange();
+      showToast('➕ コードの中に直接入れたよ！');
+    }
+
+    // ---------------------------------------------------------
+    // 9. プレビュー操作
+    // ---------------------------------------------------------
+    function refreshPreview() {
+      const html = buildFinalHtml();
+      document.getElementById('preview-iframe').srcdoc = html;
+    }
+
+    function setPreviewDevice(device) {
+      const wrapper = document.getElementById('preview-frame-wrapper');
+      const mobileBtn = document.getElementById('dev-mobile');
+      const desktopBtn = document.getElementById('dev-desktop');
+
+      if (device === 'mobile') {
+        wrapper.className = 'w-full max-w-[390px] h-[640px] bg-white rounded-[32px] shadow-xl border-[6px] border-slate-800 overflow-hidden transition-all duration-300 flex flex-col';
+        mobileBtn.className = 'pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-blue-600 text-white flex items-center gap-1';
+        desktopBtn.className = 'pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-1';
+      } else {
+        wrapper.className = 'w-full h-[640px] bg-white rounded-2xl shadow-xl border border-slate-300 overflow-hidden transition-all duration-300 flex flex-col';
+        desktopBtn.className = 'pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-blue-600 text-white flex items-center gap-1';
+        mobileBtn.className = 'pop-btn px-3 py-2 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center gap-1';
+      }
+    }
+
+    function openFullscreenPreview() {
+      const html = buildFinalHtml();
+      document.getElementById('fullscreen-iframe').srcdoc = html;
+      document.getElementById('fullscreen-preview-modal').classList.remove('hidden');
+    }
+
+    function closeFullscreenPreview() {
+      document.getElementById('fullscreen-preview-modal').classList.add('hidden');
+    }
+
+    // ---------------------------------------------------------
+    // 10. HTMLファイル保存
+    // ---------------------------------------------------------
+    function downloadHtmlFile() {
+      const html = buildFinalHtml();
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('💾 index.html を保存したよ！');
+    }
+
+    // ---------------------------------------------------------
+    // 11. 方法A：サクッと共有URLを作る
+    // ---------------------------------------------------------
+    async function generateInstantShareUrl() {
+      const html = buildFinalHtml();
+      const compressed = await compressStringToBase64Url(html);
+      const baseUrl = window.location.href.split('#')[0].split('?')[0];
+      const shareUrl = `${baseUrl}#view=${compressed}`;
+
+      const input = document.getElementById('instant-share-url-input');
+      input.value = shareUrl;
+      document.getElementById('instant-url-length').textContent = `文字数: ${shareUrl.length.toLocaleString()}文字`;
+      document.getElementById('instant-url-result').classList.remove('hidden');
+
+      // 仮プレビュー（blob: や about:srcdoc や file:）のときはわかりやすいメモを表示
+      const proto = window.location.protocol;
+      const isSandboxed = proto === 'blob:' || proto === 'about:' || proto === 'file:' || proto === 'content:';
+      if (isSandboxed) {
+        document.getElementById('sandbox-warning').classList.remove('hidden');
+      } else {
+        document.getElementById('sandbox-warning').classList.add('hidden');
+      }
+
+      showToast('🔗 共有用URLを作ったよ！');
+    }
+
+    function copyInstantUrl() {
+      const url = document.getElementById('instant-share-url-input').value;
+      copyTextToClipboard(url);
+      showToast('📋 URLをコピーしたよ！');
+    }
+
+    async function testInstantUrl() {
+      const url = document.getElementById('instant-share-url-input').value;
+      if (!url) return;
+      window.location.hash = url.split('#')[1];
+      await checkAndLaunchViewerMode();
+    }
+
+    // ---------------------------------------------------------
+    // 12. 方法B：GitHubで本格公開（全自動）
+    // ---------------------------------------------------------
+    function toggleTokenGuide() {
+      document.getElementById('gh-token-guide').classList.toggle('hidden');
+    }
+
+    function saveGithubToken() {
+      const token = document.getElementById('gh-token-input').value.trim();
+      if (!token) {
+        localStorage.removeItem('darepro_gh_token');
+        updateTokenStatusBadge(false);
+        showToast('合言葉（トークン）を消したよ');
+        return;
+      }
+      localStorage.setItem('darepro_gh_token', token);
+      updateTokenStatusBadge(true);
+      showToast('🔑 合言葉（トークン）を保存したよ！');
+    }
+
+    function updateTokenStatusBadge(isSaved) {
+      const badge = document.getElementById('gh-token-status');
+      if (isSaved) {
+        badge.textContent = '登録済み ✓';
+        badge.className = 'text-[10px] bg-emerald-100 text-emerald-700 font-black px-2 py-0.5 rounded-full';
+      } else {
+        badge.textContent = '未登録';
+        badge.className = 'text-[10px] bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded-full';
+      }
+    }
+
+    async function publishToGithubPages() {
+      const token = localStorage.getItem('darepro_gh_token') || document.getElementById('gh-token-input').value.trim();
+      const repoName = document.getElementById('gh-repo-name').value.trim();
+
+      if (!token) {
+        showToast('先に「1. 合言葉（トークン）」を登録してね！');
+        document.getElementById('gh-token-guide').classList.remove('hidden');
+        return;
+      }
+      if (!repoName || !/^[a-zA-Z0-9._-]+$/.test(repoName)) {
+        showToast('ページの名前は半角の英語・数字・ハイフンで入れてね！');
+        return;
+      }
+
+      const btn = document.getElementById('gh-publish-btn');
+      const statusBox = document.getElementById('gh-status-box');
+      const statusMsg = document.getElementById('gh-status-message');
+      const urlBox = document.getElementById('gh-published-url-box');
+
+      btn.disabled = true;
+      btn.classList.add('opacity-60');
+      statusBox.className = 'p-3.5 rounded-2xl border border-blue-200 bg-blue-50 text-blue-800 text-xs flex flex-col gap-2';
+      statusBox.classList.remove('hidden');
+      urlBox.classList.add('hidden');
+
+      const headers = {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
+
+      try {
+        statusMsg.textContent = '⏳ 1/4 GitHubアカウントを確認しているよ...';
+        const userRes = await fetch('https://api.github.com/user', { headers });
+        if (!userRes.ok) throw new Error('合言葉（トークン）が正しくないみたい。もう一度確認してね。');
+        const userData = await userRes.json();
+        const username = userData.login;
+
+        statusMsg.textContent = '⏳ 2/4 公開する場所を準備しているよ...';
+        const createRepoRes = await fetch('https://api.github.com/user/repos', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            name: repoName,
+            description: 'Created with 誰でもプログラマー（誰プロ）',
+            auto_init: false,
+            private: false
+          })
+        });
+        if (!createRepoRes.ok && createRepoRes.status !== 422) {
+          throw new Error('公開する場所の作成に失敗しました。');
+        }
+
+        statusMsg.textContent = '⏳ 3/4 作ったWebページを送っているよ...';
+        const htmlContent = buildFinalHtml();
+        const base64Content = btoa(unescape(encodeURIComponent(htmlContent)));
+
+        let fileSha = null;
+        const getFileRes = await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/index.html`, { headers });
+        if (getFileRes.ok) {
+          const fileData = await getFileRes.json();
+          fileSha = fileData.sha;
+        }
+
+        const putBody = {
+          message: 'Publish via 誰でもプログラマー（誰プロ）',
+          content: base64Content
+        };
+        if (fileSha) putBody.sha = fileSha;
+
+        const uploadRes = await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/index.html`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(putBody)
+        });
+        if (!uploadRes.ok) throw new Error('ページの送信に失敗しました。');
+
+        statusMsg.textContent = '⏳ 4/4 インターネットに公開するスイッチを入れているよ...';
+        const pagesRes = await fetch(`https://api.github.com/repos/${username}/${repoName}/pages`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ source: { branch: 'main', path: '/' } })
+        });
+        if (!pagesRes.ok && pagesRes.status !== 409) {
+          await fetch(`https://api.github.com/repos/${username}/${repoName}/pages`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ source: { branch: 'master', path: '/' } })
+          });
+        }
+
+        const publishedUrl = `https://${username}.github.io/${repoName}/`;
+        statusBox.className = 'p-3.5 rounded-2xl border-2 border-emerald-300 bg-emerald-50 text-emerald-900 text-xs flex flex-col gap-2';
+        statusMsg.textContent = '🎉 すごい！Webサイトの公開が完了したよ！';
+        document.getElementById('gh-published-url').value = publishedUrl;
+        document.getElementById('gh-open-link').href = publishedUrl;
+        urlBox.classList.remove('hidden');
+        showToast('🚀 Web公開が完了したよ！');
+
+      } catch (err) {
+        statusBox.className = 'p-3.5 rounded-2xl border-2 border-rose-300 bg-rose-50 text-rose-800 text-xs flex flex-col gap-2';
+        statusMsg.textContent = `❌ エラー: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('opacity-60');
+      }
+    }
+
+    function copyGithubUrl() {
+      const url = document.getElementById('gh-published-url').value;
+      copyTextToClipboard(url);
+      showToast('📋 公開URLをコピーしたよ！');
+    }
+
+    // ---------------------------------------------------------
+    // 13. 共通ユーティリティ
+    // ---------------------------------------------------------
+    function copyTextToClipboard(text) {
+      const tempInput = document.createElement('textarea');
+      tempInput.value = text;
+      tempInput.style.position = 'fixed';
+      tempInput.style.opacity = '0';
+      document.body.appendChild(tempInput);
+      tempInput.focus();
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+      } catch (e) {}
+      document.body.removeChild(tempInput);
+    }
+
+    let toastTimer = null;
+    function showToast(message) {
+      const toast = document.getElementById('toast-notification');
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.remove('hidden');
+      toast.classList.add('toast-show');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('toast-show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
