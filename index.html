@@ -31,6 +31,7 @@
     .btn-row {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
     button, .link-btn {
       border: 1px solid #cbd5e1;
@@ -85,14 +86,24 @@
       border-color: #2563eb;
       color: #ffffff;
     }
-    .page-name {
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    @media (max-width: 640px) {
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .input-box {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #cbd5e1;
       border-radius: 10px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
-      margin-bottom: 10px;
     }
     textarea.editor {
       width: 100%;
@@ -144,11 +155,27 @@
       margin-bottom: 12px;
     }
     .share-box.show { display: block; }
+    .url-block {
+      margin-top: 10px;
+    }
+    .url-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 4px;
+    }
+    .url-warn {
+      display: block;
+      font-size: 0.76rem;
+      color: #b45309;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
     .share-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 8px;
     }
     .share-url {
       flex: 1;
@@ -157,21 +184,37 @@
       border-radius: 10px;
       border: 1px solid #34d399;
       background: #ffffff;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
     }
+    /* 公開ページ（閲覧専用・編集不可） */
     .viewer-top {
       background: #ffffff;
       border-bottom: 1px solid #e2e8f0;
-      padding: 10px 16px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
     }
+    .viewer-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+    .viewer-author {
+      font-size: 0.78rem;
+      color: #475569;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
     .viewer-full {
       width: 100%;
-      height: calc(100vh - 56px);
+      height: calc(100vh - 50px);
       border: 0;
       display: block;
       background: #ffffff;
@@ -180,35 +223,49 @@
   </style>
 </head>
 <body>
-  <!-- 閲覧モード -->
+  <!-- 公開ページ閲覧モード（見る・遊ぶ専用） -->
   <div id="viewerScreen" class="hide">
     <div class="viewer-top">
-      <strong id="vTitle">読み込み中...</strong>
+      <div class="viewer-meta">
+        <strong id="vTitle">読み込み中...</strong>
+        <span id="vAuthor" class="viewer-author"></span>
+      </div>
       <div class="btn-row">
-        <button id="vRemixBtn" type="button" class="btn-run">改造する</button>
-        <a id="vHomeLink" class="link-btn" href="./">新しく作る</a>
+        <a id="vHomeLink" class="link-btn" href="./">誰プロで作る</a>
       </div>
     </div>
-    <iframe id="vFrame" class="viewer-full" sandbox="allow-scripts allow-modals"></iframe>
+    <iframe id="vFrame" class="viewer-full" sandbox="allow-scripts allow-forms allow-modals"></iframe>
   </div>
 
-  <!-- 作成モード -->
-  <div id="editorScreen">
+  <!-- 作成・本人修正モード -->
+  <div id="editorScreen" class="hide">
     <header>
-      <div class="title-logo">誰プロ</div>
+      <div class="title-logo" id="editorHeaderTitle">誰プロ</div>
       <div class="btn-row">
         <button id="runCodeBtn" type="button" class="btn-run">▶ 実行</button>
-        <button id="publishCodeBtn" type="button" class="btn-pub">🚀 URLで公開</button>
+        <button id="publishCodeBtn" type="button" class="btn-pub">🚀 公開する</button>
       </div>
     </header>
 
     <div class="wrap">
       <div id="shareBox" class="share-box">
-        <strong>🎉 公開できました！</strong>
-        <div class="share-row">
-          <input id="shareUrlInput" class="share-url" type="text" readonly />
-          <button id="copyShareBtn" type="button" class="btn-run">コピー</button>
-          <a id="openShareLink" class="link-btn" target="_blank" rel="noopener">開く</a>
+        <strong>🎉 ページを保存しました！</strong>
+
+        <div class="url-block">
+          <span class="url-label">① 友だちに教える「見る用URL」（他の人は編集できません）</span>
+          <div class="share-row">
+            <input id="viewUrlInput" class="share-url" type="text" readonly />
+            <button id="copyViewBtn" type="button" class="btn-run">コピー</button>
+            <a id="openViewLink" class="link-btn" target="_blank" rel="noopener">開く</a>
+          </div>
+        </div>
+
+        <div class="url-block">
+          <span class="url-warn">② 作った本人だけの「あとから修正する用URL」（他の人には教えないで保存してください）</span>
+          <div class="share-row">
+            <input id="editUrlInput" class="share-url" type="text" readonly />
+            <button id="copyEditBtn" type="button">コピー</button>
+          </div>
         </div>
       </div>
 
@@ -227,7 +284,10 @@
       </div>
 
       <div id="editPanel" class="card">
-        <input id="pageTitleInput" class="page-name" type="text" placeholder="ページのタイトル" />
+        <div class="meta-grid">
+          <input id="pageTitleInput" class="input-box" type="text" placeholder="ページのタイトル" />
+          <input id="authorInput" class="input-box" type="text" placeholder="作った人（ニックネーム・任意）" />
+        </div>
         <textarea id="codeInput" class="editor" spellcheck="false"></textarea>
         <div class="media-area">
           <strong>画像・音声を入れる（Base64）</strong>
@@ -242,7 +302,7 @@
       </div>
 
       <div id="previewPanel" class="card hide">
-        <iframe id="previewIframe" class="stage" sandbox="allow-scripts allow-modals"></iframe>
+        <iframe id="previewIframe" class="stage" sandbox="allow-scripts allow-forms allow-modals"></iframe>
       </div>
     </div>
   </div>
@@ -281,23 +341,31 @@
 
     const qs = new URLSearchParams(location.search);
     const pid = qs.get("p");
-    const rid = qs.get("remix");
+    const editKeyParam = qs.get("edit");
+
+    let activePageId = null;
+    let activeEditKey = null;
+    let isOwnerEditing = false;
 
     const viewerScreen = document.getElementById("viewerScreen");
     const editorScreen = document.getElementById("editorScreen");
+    const editorHeaderTitle = document.getElementById("editorHeaderTitle");
     const vTitle = document.getElementById("vTitle");
+    const vAuthor = document.getElementById("vAuthor");
     const vFrame = document.getElementById("vFrame");
-    const vRemixBtn = document.getElementById("vRemixBtn");
     const vHomeLink = document.getElementById("vHomeLink");
 
     const pageTitleInput = document.getElementById("pageTitleInput");
+    const authorInput = document.getElementById("authorInput");
     const codeInput = document.getElementById("codeInput");
     const previewIframe = document.getElementById("previewIframe");
     const msgBox = document.getElementById("msgBox");
     const shareBox = document.getElementById("shareBox");
-    const shareUrlInput = document.getElementById("shareUrlInput");
-    const copyShareBtn = document.getElementById("copyShareBtn");
-    const openShareLink = document.getElementById("openShareLink");
+    const viewUrlInput = document.getElementById("viewUrlInput");
+    const editUrlInput = document.getElementById("editUrlInput");
+    const copyViewBtn = document.getElementById("copyViewBtn");
+    const copyEditBtn = document.getElementById("copyEditBtn");
+    const openViewLink = document.getElementById("openViewLink");
 
     const showEditTab = document.getElementById("showEditTab");
     const showViewTab = document.getElementById("showViewTab");
@@ -315,6 +383,21 @@
     function baseUrl() {
       const u = new URL(location.href);
       u.search = "";
+      return u.toString();
+    }
+
+    function buildViewUrl(id) {
+      const u = new URL(location.href);
+      u.search = "";
+      u.searchParams.set("p", id);
+      return u.toString();
+    }
+
+    function buildEditUrl(id, key) {
+      const u = new URL(location.href);
+      u.search = "";
+      u.searchParams.set("p", id);
+      u.searchParams.set("edit", key);
       return u.toString();
     }
 
@@ -337,11 +420,34 @@
       }
     }
 
-    function makeId() {
+    function makeId(len = 6) {
       const chars = "abcdefghjkmnpqrstuvwxyz23456789";
       let s = "";
-      for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
       return s;
+    }
+
+    function makeEditKey(len = 14) {
+      const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let s = "";
+      for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+      return s;
+    }
+
+    async function copyText(text, btn, defaultLabel) {
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+      btn.textContent = "コピー済";
+      setTimeout(() => { btn.textContent = defaultLabel; }, 1500);
     }
 
     showEditTab.addEventListener("click", () => switchTab("edit"));
@@ -394,84 +500,121 @@
       }
       publishCodeBtn.disabled = true;
       publishCodeBtn.textContent = "保存中...";
+
       try {
-        const id = makeId();
         const title = pageTitleInput.value.trim() || "無題";
-        await setDoc(doc(db, COL, id), { title, code, createdAt: serverTimestamp() });
-        const u = new URL(location.href);
-        u.search = "";
-        u.searchParams.set("p", id);
-        shareUrlInput.value = u.toString();
-        openShareLink.href = u.toString();
+        const author = authorInput.value.trim();
+
+        let id = activePageId;
+        let key = activeEditKey;
+
+        if (!isOwnerEditing || !id || !key) {
+          id = makeId(6);
+          key = makeEditKey(14);
+        }
+
+        await setDoc(doc(db, COL, id), {
+          title,
+          author,
+          code,
+          editKey: key,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        activePageId = id;
+        activeEditKey = key;
+        isOwnerEditing = true;
+        editorHeaderTitle.textContent = "誰プロ（自分のページを修正中）";
+        publishCodeBtn.textContent = "💾 上書き保存";
+
+        const vUrl = buildViewUrl(id);
+        const eUrl = buildEditUrl(id, key);
+        viewUrlInput.value = vUrl;
+        openViewLink.href = vUrl;
+        editUrlInput.value = eUrl;
         shareBox.classList.add("show");
-        setMsg("短いURLを発行しました！");
+
+        setMsg("保存しました！同じ「見る用URL」のまま中身が更新されます。");
       } catch (e) {
         console.error(e);
         setMsg("保存に失敗しました。Firestoreの設定を確認してください。");
       } finally {
         publishCodeBtn.disabled = false;
-        publishCodeBtn.textContent = "🚀 URLで公開";
+        if (!isOwnerEditing) {
+          publishCodeBtn.textContent = "🚀 公開する";
+        } else {
+          publishCodeBtn.textContent = "💾 上書き保存";
+        }
       }
     });
 
-    copyShareBtn.addEventListener("click", async () => {
-      if (!shareUrlInput.value) return;
-      try {
-        await navigator.clipboard.writeText(shareUrlInput.value);
-      } catch {
-        shareUrlInput.select();
-        document.execCommand("copy");
-      }
-      copyShareBtn.textContent = "コピー済";
-      setTimeout(() => { copyShareBtn.textContent = "コピー"; }, 1500);
-    });
+    copyViewBtn.addEventListener("click", () => copyText(viewUrlInput.value, copyViewBtn, "コピー"));
+    copyEditBtn.addEventListener("click", () => copyText(editUrlInput.value, copyEditBtn, "コピー"));
 
-    vRemixBtn.addEventListener("click", () => {
-      if (!pid) return;
-      const u = new URL(location.href);
-      u.search = "";
-      u.searchParams.set("remix", pid);
-      location.href = u.toString();
-    });
+    async function showViewer(data) {
+      viewerScreen.classList.remove("hide");
+      editorScreen.classList.add("hide");
+      const title = data.title || "無題";
+      document.title = title + " - 誰プロ";
+      vTitle.textContent = title;
+      vAuthor.textContent = data.author ? "作：" + data.author : "誰プロ作品";
+      vFrame.srcdoc = data.code;
+    }
 
     async function init() {
       vHomeLink.href = baseUrl();
+
       if (pid) {
-        viewerScreen.classList.remove("hide");
-        editorScreen.classList.add("hide");
         try {
           const snap = await getDoc(doc(db, COL, pid));
-          if (snap.exists() && snap.data().code) {
-            vTitle.textContent = snap.data().title || "無題";
-            vFrame.srcdoc = snap.data().code;
-          } else {
+          if (!snap.exists() || !snap.data().code) {
+            viewerScreen.classList.remove("hide");
+            editorScreen.classList.add("hide");
             vTitle.textContent = "ページが見つかりません";
+            return;
           }
+
+          const d = snap.data();
+
+          // 本人だけが持つ edit キーが一致した場合のみ修正モードへ
+          if (editKeyParam && d.editKey && editKeyParam === d.editKey) {
+            viewerScreen.classList.add("hide");
+            editorScreen.classList.remove("hide");
+            activePageId = pid;
+            activeEditKey = d.editKey;
+            isOwnerEditing = true;
+            editorHeaderTitle.textContent = "誰プロ（自分のページを修正中）";
+            publishCodeBtn.textContent = "💾 上書き保存";
+
+            pageTitleInput.value = d.title || "無題";
+            authorInput.value = d.author || "";
+            codeInput.value = d.code;
+            updateView();
+
+            const vUrl = buildViewUrl(pid);
+            const eUrl = buildEditUrl(pid, d.editKey);
+            viewUrlInput.value = vUrl;
+            openViewLink.href = vUrl;
+            editUrlInput.value = eUrl;
+            shareBox.classList.add("show");
+            setMsg("自分のページを読み込みました！コードを直して「💾 上書き保存」を押すと公開ページに反映されます。");
+            return;
+          }
+
+          // それ以外の人は「見る・遊ぶ専用」画面
+          await showViewer(d);
+          return;
         } catch (e) {
           console.error(e);
+          viewerScreen.classList.remove("hide");
+          editorScreen.classList.add("hide");
           vTitle.textContent = "読み込みエラー";
+          return;
         }
-        return;
       }
 
       editorScreen.classList.remove("hide");
       viewerScreen.classList.add("hide");
-
-      if (rid) {
-        try {
-          const snap = await getDoc(doc(db, COL, rid));
-          if (snap.exists() && snap.data().code) {
-            pageTitleInput.value = (snap.data().title || "作品") + "（改造）";
-            codeInput.value = snap.data().code;
-            updateView();
-            setMsg("元のページを読み込みました！自由に改造できます。");
-            return;
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
       pageTitleInput.value = TPLS.card.title;
       codeInput.value = TPLS.card.html;
       updateView();
