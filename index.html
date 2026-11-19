@@ -6,362 +6,608 @@
   <title>誰でもプログラマー（誰プロ）</title>
   <style>
     :root {
-      --bg: #f6f8fc;
-      --card: #ffffff;
-      --ink: #1e293b;
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --ink: #0f172a;
       --muted: #64748b;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --accent: #10b981;
-      --danger: #ef4444;
-      --border: #e2e8f0;
-      --radius: 14px;
+      --line: #e2e8f0;
+      --brand: #2563eb;
+      --brand-dark: #1d4ed8;
+      --brand-soft: #eff6ff;
+      --ok: #059669;
+      --ok-bg: #ecfdf5;
+      --err: #dc2626;
+      --err-bg: #fef2f2;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 9px;
+      --shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
     }
 
     * {
       box-sizing: border-box;
     }
 
-    body {
+    html, body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      padding: 0;
       background: var(--bg);
       color: var(--ink);
-      line-height: 1.6;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.55;
     }
 
-    header {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
+    /* ヘッダー */
+    .topbar {
       position: sticky;
       top: 0;
-      z-index: 20;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      z-index: 30;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 16px;
     }
 
-    .brand {
+    .topbar-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
       display: flex;
       align-items: center;
       gap: 8px;
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+      letter-spacing: 0.01em;
     }
 
-    .brand-badge {
-      background: linear-gradient(135deg, #2563eb, #06b6d4);
+    .logo-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
       color: #fff;
-      font-size: 0.75rem;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
       padding: 2px 8px;
       border-radius: 999px;
     }
 
-    .toolbar {
+    .actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    button, .btn {
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--ink);
-      padding: 8px 14px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.15s ease;
-    }
-
-    button:hover, .btn:hover {
-      background: #f1f5f9;
-    }
-
-    button.primary {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-    }
-
-    button.primary:hover {
-      background: var(--primary-hover);
-    }
-
-    button.accent {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    button.accent:hover {
-      filter: brightness(0.95);
-    }
-
-    .container {
-      max-width: 1180px;
-      margin: 16px auto;
-      padding: 0 14px 48px;
-    }
-
-    .templates {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      display: flex;
-      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .templates-label {
-      font-size: 0.85rem;
+    button, .btn-link {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+      border-radius: var(--radius-sm);
+      padding: 9px 14px;
+      font-size: 0.88rem;
       font-weight: 700;
-      color: var(--muted);
-      margin-right: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    button:active, .btn-link:active {
+      transform: scale(0.98);
+    }
+
+    button:hover, .btn-link:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-dark);
+      border-color: var(--brand-dark);
+    }
+
+    .btn-publish {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: #fff;
+    }
+
+    .btn-publish:hover {
+      background: #047857;
+      border-color: #047857;
+    }
+
+    /* メイン枠 */
+    .main {
+      max-width: 1240px;
+      margin: 16px auto 0;
+      padding: 0 14px 64px;
+      display: flex;
+      flex-direction: column;
       gap: 14px;
     }
 
-    @media (max-width: 820px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
     }
 
-    .panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
+    /* テンプレートバー */
+    .tpl-bar {
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tpl-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-right: 2px;
+    }
+
+    .tpl-chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      background: var(--surface-soft);
+    }
+
+    .tpl-chip.active {
+      background: var(--brand-soft);
+      border-color: #93c5fd;
+      color: var(--brand-dark);
+    }
+
+    /* ステータス＆公開URLカード */
+    .status-banner {
+      display: none;
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .status-banner.show {
+      display: block;
+    }
+
+    .status-banner.info {
+      background: var(--brand-soft);
+      border-color: #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .status-banner.ok {
+      background: var(--ok-bg);
+      border-color: #a7f3d0;
+      color: #065f46;
+    }
+
+    .status-banner.err {
+      background: var(--err-bg);
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .publish-card {
+      display: none;
+      padding: 16px;
+      background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+      border-color: #bbf7d0;
+    }
+
+    .publish-card.show {
+      display: block;
+    }
+
+    .publish-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #065f46;
+      margin-bottom: 8px;
+    }
+
+    .url-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .url-input {
+      flex: 1;
+      min-width: 210px;
+      padding: 10px 12px;
+      border: 1px solid #86efac;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      font-size: 0.9rem;
+      color: var(--ink);
+    }
+
+    /* スマホ用ビュー切替タブ */
+    .mobile-tabs {
+      display: none;
+      gap: 8px;
+    }
+
+    .mobile-tabs button {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--radius-md);
+    }
+
+    .mobile-tabs button.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #fff;
+    }
+
+    /* エディタ＆プレビュー2カラム */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .pane {
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      min-height: 520px;
     }
 
-    .panel-head {
-      padding: 10px 14px;
-      background: #f8fafc;
-      border-bottom: 1px solid var(--border);
-      font-weight: 700;
-      font-size: 0.9rem;
+    .pane-header {
+      padding: 11px 14px;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-    }
-
-    .title-input {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .editor-body {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    textarea.code-box {
-      width: 100%;
-      min-height: 360px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      resize: vertical;
-      background: #0f172a;
-      color: #f8fafc;
-    }
-
-    .media-box {
-      border: 1px dashed #cbd5e1;
-      border-radius: 10px;
-      padding: 10px;
-      background: #f8fafc;
-      font-size: 0.85rem;
-    }
-
-    .media-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .preview-frame {
-      width: 100%;
-      min-height: 460px;
-      border: 0;
-      background: #fff;
-      flex: 1;
-    }
-
-    .share-box {
-      margin-top: 14px;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: var(--radius);
-      padding: 14px;
-      display: none;
-    }
-
-    .share-box.show {
-      display: block;
-    }
-
-    .share-url-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .share-url-input {
-      flex: 1;
-      min-width: 220px;
-      padding: 9px 12px;
-      border: 1px solid #93c5fd;
-      border-radius: 10px;
-      background: #fff;
-      font-size: 0.92rem;
-    }
-
-    .status-msg {
-      margin-top: 10px;
       font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .pane-sub {
+      font-size: 0.76rem;
+      font-weight: 600;
       color: var(--muted);
     }
 
-    /* 公開ページ閲覧モード */
-    .viewer-banner {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 10px 16px;
+    .editor-stack {
+      padding: 14px;
       display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
     }
 
-    .viewer-frame {
-      width: 100%;
-      min-height: calc(100vh - 56px);
-      border: 0;
+    .field-label {
       display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .title-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--ink);
       background: #fff;
     }
 
-    .center-msg {
-      max-width: 520px;
-      margin: 60px auto;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
+    .title-field:focus,
+    .code-area:focus,
+    .url-input:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    .code-area {
+      width: 100%;
+      min-height: 310px;
+      flex: 1;
+      padding: 13px;
+      border: 1px solid #1e293b;
+      border-radius: var(--radius-md);
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    .asset-box {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 11px 12px;
+    }
+
+    .asset-head {
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .asset-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .asset-controls input[type="file"] {
+      flex: 1;
+      min-width: 180px;
+      font-size: 0.82rem;
+    }
+
+    .asset-note {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .preview-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+
+    .preview-iframe {
+      width: 100%;
+      flex: 1;
+      min-height: 460px;
+      border: 0;
+      background: #fff;
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 860px) {
+      .mobile-tabs {
+        display: flex;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .pane {
+        min-height: 420px;
+      }
+
+      .pane.hidden-mobile {
+        display: none;
+      }
+
+      .code-area {
+        min-height: 260px;
+      }
+
+      .preview-iframe {
+        min-height: 380px;
+      }
+    }
+
+    /* 公開ページ閲覧モード */
+    .viewer-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .viewer-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .viewer-bar-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .viewer-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .viewer-page-title {
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .viewer-badge {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .viewer-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .viewer-iframe {
+      width: 100%;
+      flex: 1;
+      min-height: calc(100vh - 58px);
+      border: 0;
+      background: #fff;
+    }
+
+    .empty-state {
+      max-width: 480px;
+      margin: 64px auto;
+      padding: 28px 22px;
       text-align: center;
+    }
+
+    .empty-state h2 {
+      margin: 0 0 8px;
+      font-size: 1.2rem;
+    }
+
+    .empty-state p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.92rem;
     }
   </style>
 </head>
 <body>
-  <!-- 公開ページ閲覧モード用 -->
-  <div id="viewerMode" style="display:none;">
-    <div class="viewer-banner">
-      <div>
-        <strong id="viewerTitle">公開ページ</strong>
-        <span style="font-size:0.8rem; color:var(--muted); margin-left:6px;">誰プロで作成</span>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <button id="remixBtn" class="primary">このページを改造する</button>
-        <a id="newMakeLink" class="btn" href="./">新しく作る</a>
+  <!-- 公開ページ閲覧モード -->
+  <div id="viewerView" class="viewer-wrap" style="display:none;">
+    <div class="viewer-bar">
+      <div class="viewer-bar-inner">
+        <div class="viewer-meta">
+          <span id="viewerTitle" class="viewer-page-title">読み込み中...</span>
+          <span class="viewer-badge">誰プロで作成</span>
+        </div>
+        <div class="actions">
+          <button id="remixAction" type="button" class="btn-primary">このページを改造する</button>
+          <a id="createNewLink" class="btn-link" href="./">新しく作る</a>
+        </div>
       </div>
     </div>
-    <iframe id="viewerFrame" class="viewer-frame" sandbox="allow-scripts allow-modals"></iframe>
+    <div id="viewerStage" class="viewer-stage">
+      <iframe id="viewerFrame" class="viewer-iframe" sandbox="allow-scripts allow-modals"></iframe>
+    </div>
   </div>
 
-  <!-- 作成・編集モード用 -->
-  <div id="editorMode">
-    <header>
-      <div class="brand">
-        <span>誰でもプログラマー</span>
-        <span class="brand-badge">誰プロ</span>
-      </div>
-      <div class="toolbar">
-        <button id="runBtn">▶ プレビュー更新</button>
-        <button id="publishBtn" class="accent">🚀 短いURLで公開</button>
+  <!-- 作成・編集モード -->
+  <div id="editorView">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="logo">
+          <span>誰でもプログラマー</span>
+          <span class="logo-pill">誰プロ</span>
+        </div>
+        <div class="actions">
+          <button id="refreshPreviewBtn" type="button">▶ プレビュー更新</button>
+          <button id="publishAction" type="button" class="btn-publish">🚀 短いURLで公開</button>
+        </div>
       </div>
     </header>
 
-    <div class="container">
-      <div class="templates">
-        <span class="templates-label">かんたんテンプレート：</span>
-        <button type="button" data-tpl="profile">🙋 自己紹介カード</button>
-        <button type="button" data-tpl="omikuji">🎋 おみくじ</button>
-        <button type="button" data-tpl="clicker">⚡ クリッカー</button>
-      </div>
+    <main class="main">
+      <!-- テンプレート選択 -->
+      <section class="card tpl-bar" aria-label="テンプレート">
+        <span class="tpl-label">テンプレート：</span>
+        <button type="button" class="tpl-chip active" data-template="profile">🙋 自己紹介カード</button>
+        <button type="button" class="tpl-chip" data-template="omikuji">🎋 おみくじ</button>
+        <button type="button" class="tpl-chip" data-template="clicker">⚡ 連打クリッカー</button>
+      </section>
 
-      <div id="shareBox" class="share-box">
-        <strong>🎉 公開できました！この短いURLを友だちに送れます：</strong>
-        <div class="share-url-row">
-          <input id="shareUrlInput" class="share-url-input" type="text" readonly />
-          <button id="copyUrlBtn" class="primary">URLをコピー</button>
-          <a id="openPublishedLink" class="btn" target="_blank" rel="noopener">ページを開く</a>
+      <!-- 公開URL案内 -->
+      <section id="publishCard" class="card publish-card" aria-live="polite">
+        <div class="publish-title">🎉 公開完了！短いURLができました</div>
+        <div class="url-group">
+          <input id="shareUrlField" class="url-input" type="text" readonly />
+          <button id="copyUrlAction" type="button" class="btn-primary">URLをコピー</button>
+          <a id="openPageLink" class="btn-link" target="_blank" rel="noopener">ページを開く</a>
         </div>
+      </section>
+
+      <!-- メッセージ表示 -->
+      <div id="statusBanner" class="status-banner info show" role="status"></div>
+
+      <!-- スマホ用タブ切替 -->
+      <div class="mobile-tabs">
+        <button id="tabCodeBtn" type="button" class="active">✏️ コード</button>
+        <button id="tabPreviewBtn" type="button">👀 プレビュー</button>
       </div>
 
-      <div id="statusMsg" class="status-msg"></div>
-
-      <div class="grid" style="margin-top:10px;">
-        <div class="panel">
-          <div class="panel-head">
-            <span>✏️ コードを書く場所</span>
-            <span style="font-size:0.78rem; color:var(--muted);">HTML / CSS / JS</span>
+      <!-- メイン作業エリア -->
+      <div class="workspace">
+        <section id="codePane" class="card pane">
+          <div class="pane-header">
+            <span>✏️ コード編集</span>
+            <span class="pane-sub">HTML / CSS / JS</span>
           </div>
-          <div class="editor-body">
-            <input id="pageTitleInput" class="title-input" type="text" placeholder="ページのタイトル（例：ぼくの自己紹介）" value="ぼくの自己紹介" />
-            <textarea id="codeEditor" class="code-box" spellcheck="false"></textarea>
+          <div class="editor-stack">
+            <div>
+              <label for="titleField" class="field-label">ページタイトル</label>
+              <input id="titleField" class="title-field" type="text" maxlength="80" placeholder="例：ぼくの自己紹介" />
+            </div>
 
-            <div class="media-box">
-              <strong>📎 画像・音声をコードに埋め込む（Base64）</strong>
-              <div class="media-row">
-                <input id="mediaFileInput" type="file" accept="image/*,audio/*" />
-                <button id="insertMediaBtn" type="button">コードに挿入</button>
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label for="codeField" class="field-label">プログラムコード</label>
+              <textarea id="codeField" class="code-area" spellcheck="false"></textarea>
+            </div>
+
+            <div class="asset-box">
+              <div class="asset-head">📎 画像・音声を埋め込む（Base64）</div>
+              <div class="asset-controls">
+                <input id="assetFileInput" type="file" accept="image/*,audio/*" />
+                <button id="insertAssetBtn" type="button">挿入</button>
               </div>
-              <div id="mediaHint" style="color:var(--muted); margin-top:4px;">
-                選んだ画像や音声をデータ化してカーソル位置に挿入します（大きいファイルは保存に時間がかかることがあります）。
+              <div id="assetStatus" class="asset-note">
+                カーソル位置に画像・音声データを挿入します（軽めのファイルがおすすめです）。
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="panel">
-          <div class="panel-head">
-            <span>👀 プレビュー</span>
-            <span style="font-size:0.78rem; color:var(--muted);">自動反映</span>
+        <section id="previewPane" class="card pane hidden-mobile">
+          <div class="pane-header">
+            <span>👀 ライブプレビュー</span>
+            <span class="pane-sub">入力で自動更新</span>
           </div>
-          <iframe id="previewFrame" class="preview-frame" sandbox="allow-scripts allow-modals"></iframe>
-        </div>
+          <div class="preview-box">
+            <iframe id="previewFrame" class="preview-iframe" sandbox="allow-scripts allow-modals"></iframe>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   </div>
 
   <script type="module">
@@ -374,7 +620,6 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Firebase 接続設定（darepro-app）
     const firebaseConfig = {
       apiKey: "AIzaSyDMFcak07d3Yv1OCrWS-Src_EELS-k61PE",
       authDomain: "darepro-app.firebaseapp.com",
@@ -386,7 +631,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const COLLECTION_NAME = "darepro_pages";
+    const COLLECTION = "darepro_pages";
 
     const TEMPLATES = {
       profile: {
@@ -395,41 +640,44 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     margin: 0;
     min-height: 100vh;
     display: grid;
     place-items: center;
-    background: linear-gradient(135deg, #e0f2fe, #fef9c3);
+    background: linear-gradient(135deg, #dbeafe, #fef08a);
     font-family: sans-serif;
+    padding: 16px;
   }
   .card {
     background: #fff;
-    padding: 28px;
-    border-radius: 20px;
+    padding: 28px 22px;
+    border-radius: 22px;
     max-width: 360px;
-    width: 90%;
+    width: 100%;
     text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.1);
   }
-  h1 { margin: 8px 0; font-size: 1.6rem; }
-  p { color: #475569; }
+  .avatar { font-size: 3.2rem; }
+  h1 { margin: 10px 0 6px; font-size: 1.5rem; color: #0f172a; }
+  p { margin: 0 0 16px; color: #475569; font-size: 0.95rem; }
   button {
-    margin-top: 12px;
     background: #2563eb;
     color: #fff;
     border: 0;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: bold;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
     cursor: pointer;
   }
 </style>
 </head>
 <body>
   <div class="card">
-    <div style="font-size:3rem;">🌟</div>
+    <div class="avatar">🌟</div>
     <h1>○○のページ</h1>
     <p>好きなこと：ゲーム・プログラミング・お絵かき</p>
     <button onclick="alert('見てくれてありがとう！')">あいさつする</button>
@@ -443,6 +691,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     margin: 0;
@@ -451,17 +700,19 @@
     place-items: center;
     background: #fff1f2;
     font-family: sans-serif;
-    text-align: center;
+    padding: 16px;
   }
   .box {
     background: #fff;
-    padding: 32px 24px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    width: 90%;
+    padding: 30px 22px;
+    border-radius: 22px;
     max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(190, 18, 60, 0.1);
   }
-  #result { font-size: 2.4rem; font-weight: bold; margin: 18px 0; color: #e11d48; }
+  h2 { margin: 0; font-size: 1.3rem; }
+  #result { font-size: 2.3rem; font-weight: 800; color: #e11d48; margin: 20px 0; }
   button {
     background: #e11d48;
     color: #fff;
@@ -469,7 +720,7 @@
     padding: 12px 22px;
     border-radius: 12px;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
   }
 </style>
@@ -481,10 +732,10 @@
     <button onclick="draw()">おみくじを引く</button>
   </div>
   <script>
-    const list = ["大吉 🎉", "中吉 😊", "小吉 ✨", "吉 🙂", "末吉 🌱"];
+    const results = ["大吉 🎉", "中吉 😊", "小吉 ✨", "吉 🙂", "末吉 🌱"];
     function draw() {
-      const pick = list[Math.floor(Math.random() * list.length)];
-      document.getElementById("result").textContent = pick;
+      document.getElementById("result").textContent =
+        results[Math.floor(Math.random() * results.length)];
     }
   </script>
 </body>
@@ -496,6 +747,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
     margin: 0;
@@ -504,25 +756,27 @@
     place-items: center;
     background: #ecfdf5;
     font-family: sans-serif;
-    text-align: center;
+    padding: 16px;
   }
   .game {
     background: #fff;
-    padding: 28px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    width: 90%;
+    padding: 28px 22px;
+    border-radius: 22px;
     max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(5, 150, 105, 0.12);
   }
-  #count { font-size: 3rem; font-weight: 800; color: #059669; margin: 12px 0; }
+  h2 { margin: 0; font-size: 1.3rem; }
+  #count { font-size: 3rem; font-weight: 800; color: #059669; margin: 14px 0; }
   button {
     background: #10b981;
     color: #fff;
     border: 0;
-    padding: 14px 24px;
+    padding: 13px 24px;
     border-radius: 14px;
-    font-size: 1.1rem;
-    font-weight: bold;
+    font-size: 1.05rem;
+    font-weight: 700;
     cursor: pointer;
   }
 </style>
@@ -531,13 +785,13 @@
   <div class="game">
     <h2>⚡ 連打チャレンジ</h2>
     <div id="count">0</div>
-    <button onclick="add()">タップ！</button>
+    <button onclick="tap()">タップ！</button>
   </div>
   <script>
-    let n = 0;
-    function add() {
-      n++;
-      document.getElementById("count").textContent = n;
+    let score = 0;
+    function tap() {
+      score += 1;
+      document.getElementById("count").textContent = score;
     }
   </script>
 </body>
@@ -547,260 +801,294 @@
 
     const params = new URLSearchParams(window.location.search);
     const pageId = params.get("p");
+    const remixId = params.get("remix");
 
-    const viewerModeEl = document.getElementById("viewerMode");
-    const editorModeEl = document.getElementById("editorMode");
-    const viewerTitleEl = document.getElementById("viewerTitle");
-    const viewerFrameEl = document.getElementById("viewerFrame");
-    const remixBtnEl = document.getElementById("remixBtn");
-    const newMakeLinkEl = document.getElementById("newMakeLink");
+    // 要素参照
+    const viewerView = document.getElementById("viewerView");
+    const editorView = document.getElementById("editorView");
+    const viewerTitle = document.getElementById("viewerTitle");
+    const viewerStage = document.getElementById("viewerStage");
+    const viewerFrame = document.getElementById("viewerFrame");
+    const remixAction = document.getElementById("remixAction");
+    const createNewLink = document.getElementById("createNewLink");
 
-    const pageTitleInput = document.getElementById("pageTitleInput");
-    const codeEditor = document.getElementById("codeEditor");
+    const titleField = document.getElementById("titleField");
+    const codeField = document.getElementById("codeField");
     const previewFrame = document.getElementById("previewFrame");
-    const runBtn = document.getElementById("runBtn");
-    const publishBtn = document.getElementById("publishBtn");
-    const shareBox = document.getElementById("shareBox");
-    const shareUrlInput = document.getElementById("shareUrlInput");
-    const copyUrlBtn = document.getElementById("copyUrlBtn");
-    const openPublishedLink = document.getElementById("openPublishedLink");
-    const statusMsg = document.getElementById("statusMsg");
-    const mediaFileInput = document.getElementById("mediaFileInput");
-    const insertMediaBtn = document.getElementById("insertMediaBtn");
-    const mediaHint = document.getElementById("mediaHint");
+    const refreshPreviewBtn = document.getElementById("refreshPreviewBtn");
+    const publishAction = document.getElementById("publishAction");
+    const publishCard = document.getElementById("publishCard");
+    const shareUrlField = document.getElementById("shareUrlField");
+    const copyUrlAction = document.getElementById("copyUrlAction");
+    const openPageLink = document.getElementById("openPageLink");
+    const statusBanner = document.getElementById("statusBanner");
 
-    let loadedData = null;
+    const tabCodeBtn = document.getElementById("tabCodeBtn");
+    const tabPreviewBtn = document.getElementById("tabPreviewBtn");
+    const codePane = document.getElementById("codePane");
+    const previewPane = document.getElementById("previewPane");
 
-    function setStatus(text, isError = false) {
-      statusMsg.textContent = text;
-      statusMsg.style.color = isError ? "#dc2626" : "#64748b";
+    const assetFileInput = document.getElementById("assetFileInput");
+    const insertAssetBtn = document.getElementById("insertAssetBtn");
+    const assetStatus = document.getElementById("assetStatus");
+
+    function setBanner(text, type = "info") {
+      statusBanner.textContent = text;
+      statusBanner.className = `status-banner show ${type}`;
     }
 
-    function generateShortId(len = 6) {
-      const chars = "abcdefghjkmnpqrstuvwxyz23456789";
-      let id = "";
-      for (let i = 0; i < len; i++) {
-        id += chars[Math.floor(Math.random() * chars.length)];
+    function setMobileTab(mode) {
+      if (mode === "preview") {
+        tabCodeBtn.classList.remove("active");
+        tabPreviewBtn.classList.add("active");
+        codePane.classList.add("hidden-mobile");
+        previewPane.classList.remove("hidden-mobile");
+      } else {
+        tabPreviewBtn.classList.remove("active");
+        tabCodeBtn.classList.add("active");
+        previewPane.classList.add("hidden-mobile");
+        codePane.classList.remove("hidden-mobile");
       }
-      return id;
     }
 
-    function buildShareUrl(id) {
-      const url = new URL(window.location.href);
-      url.search = "";
-      url.searchParams.set("p", id);
-      return url.toString();
+    function setActiveTemplateChip(key) {
+      document.querySelectorAll("[data-template]").forEach((el) => {
+        el.classList.toggle("active", el.getAttribute("data-template") === key);
+      });
     }
 
-    function buildEditorBaseUrl() {
-      const url = new URL(window.location.href);
-      url.search = "";
-      return url.toString();
+    function createShortId(length = 6) {
+      const alphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+      let out = "";
+      for (let i = 0; i < length; i++) {
+        out += alphabet[Math.floor(Math.random() * alphabet.length)];
+      }
+      return out;
     }
 
-    function updatePreview() {
-      previewFrame.srcdoc = codeEditor.value;
+    function getBaseUrl() {
+      const u = new URL(window.location.href);
+      u.search = "";
+      return u.toString();
     }
 
-    function insertAtCursor(textToInsert) {
-      const start = codeEditor.selectionStart ?? codeEditor.value.length;
-      const end = codeEditor.selectionEnd ?? codeEditor.value.length;
-      const before = codeEditor.value.slice(0, start);
-      const after = codeEditor.value.slice(end);
-      codeEditor.value = before + textToInsert + after;
-      codeEditor.focus();
-      const nextPos = start + textToInsert.length;
-      codeEditor.setSelectionRange(nextPos, nextPos);
-      updatePreview();
+    function getShareUrl(id) {
+      const u = new URL(window.location.href);
+      u.search = "";
+      u.searchParams.set("p", id);
+      return u.toString();
     }
 
-    async function fetchPageById(id) {
-      const snap = await getDoc(doc(db, COLLECTION_NAME, id));
+    function renderPreview() {
+      previewFrame.srcdoc = codeField.value;
+    }
+
+    function insertTextAtCursor(snippet) {
+      const start = codeField.selectionStart ?? codeField.value.length;
+      const end = codeField.selectionEnd ?? codeField.value.length;
+      const before = codeField.value.slice(0, start);
+      const after = codeField.value.slice(end);
+      codeField.value = before + snippet + after;
+      codeField.focus();
+      const next = start + snippet.length;
+      codeField.setSelectionRange(next, next);
+      renderPreview();
+    }
+
+    async function loadPageDoc(id) {
+      const snap = await getDoc(doc(db, COLLECTION, id));
       return snap.exists() ? snap.data() : null;
     }
 
-    async function initViewer(id) {
-      viewerModeEl.style.display = "block";
-      editorModeEl.style.display = "none";
-      newMakeLinkEl.href = buildEditorBaseUrl();
-      viewerTitleEl.textContent = "読み込み中...";
+    async function startViewer(id) {
+      viewerView.style.display = "flex";
+      editorView.style.display = "none";
+      createNewLink.href = getBaseUrl();
 
       try {
-        const data = await fetchPageById(id);
+        const data = await loadPageDoc(id);
         if (!data || !data.code) {
-          viewerTitleEl.textContent = "ページが見つかりません";
-          viewerFrameEl.outerHTML = `
-            <div class="center-msg">
+          viewerTitle.textContent = "ページが見つかりません";
+          viewerStage.innerHTML = `
+            <div class="card empty-state">
               <h2>ページが見つかりませんでした</h2>
               <p>URLが間違っているか、まだ公開されていない可能性があります。</p>
-              <a class="btn primary" href="${buildEditorBaseUrl()}">誰プロで新しく作る</a>
+              <a class="btn-link btn-primary" href="${getBaseUrl()}">誰プロで新しく作る</a>
             </div>
           `;
           return;
         }
-        loadedData = data;
+
         const title = data.title || "無題のページ";
         document.title = `${title} - 誰プロ`;
-        viewerTitleEl.textContent = title;
-        viewerFrameEl.srcdoc = data.code;
+        viewerTitle.textContent = title;
+        viewerFrame.srcdoc = data.code;
       } catch (err) {
         console.error(err);
-        viewerTitleEl.textContent = "読み込みエラー";
-        viewerFrameEl.outerHTML = `
-          <div class="center-msg">
+        viewerTitle.textContent = "読み込みエラー";
+        viewerStage.innerHTML = `
+          <div class="card empty-state">
             <h2>読み込みに失敗しました</h2>
-            <p>通信環境やFirestoreのルール設定を確認してください。</p>
-            <a class="btn primary" href="${buildEditorBaseUrl()}">編集画面へ戻る</a>
+            <p>通信状況やFirestoreの設定をご確認ください。</p>
+            <a class="btn-link btn-primary" href="${getBaseUrl()}">編集画面へ戻る</a>
           </div>
         `;
       }
     }
 
-    async function initEditor() {
-      viewerModeEl.style.display = "none";
-      editorModeEl.style.display = "block";
+    async function startEditor() {
+      viewerView.style.display = "none";
+      editorView.style.display = "block";
+      createNewLink.href = getBaseUrl();
 
-      const remixId = params.get("remix");
       if (remixId) {
-        setStatus("元のページを読み込み中...");
+        setBanner("元のページを読み込んでいます...", "info");
         try {
-          const srcData = await fetchPageById(remixId);
-          if (srcData && srcData.code) {
-            pageTitleInput.value = `${srcData.title || "作品"}（改造）`;
-            codeEditor.value = srcData.code;
-            updatePreview();
-            setStatus("元のページを読み込みました！自由に改造して公開できます。");
+          const src = await loadPageDoc(remixId);
+          if (src && src.code) {
+            setActiveTemplateChip("");
+            titleField.value = `${src.title || "作品"}（改造）`;
+            codeField.value = src.code;
+            renderPreview();
+            setBanner("元のページを読み込みました！自由に書き換えて公開できます。", "ok");
             return;
           }
-        } catch (e) {
-          console.error(e);
+        } catch (err) {
+          console.error(err);
         }
       }
 
-      pageTitleInput.value = TEMPLATES.profile.title;
-      codeEditor.value = TEMPLATES.profile.code;
-      updatePreview();
-      setStatus("テンプレートを触ったりコードを書き換えて、「短いURLで公開」を押してみてください！");
+      setActiveTemplateChip("profile");
+      titleField.value = TEMPLATES.profile.title;
+      codeField.value = TEMPLATES.profile.code;
+      renderPreview();
+      setBanner("テンプレートを選んだりコードを書き換えて、「短いURLで公開」を押してみてください。", "info");
     }
 
-    // イベント登録
-    remixBtnEl?.addEventListener("click", () => {
-      if (!pageId) return;
-      const url = new URL(window.location.href);
-      url.search = "";
-      url.searchParams.set("remix", pageId);
-      window.location.href = url.toString();
+    // イベント設定
+    tabCodeBtn.addEventListener("click", () => setMobileTab("code"));
+    tabPreviewBtn.addEventListener("click", () => {
+      renderPreview();
+      setMobileTab("preview");
     });
 
-    document.querySelectorAll("[data-tpl]").forEach((btn) => {
+    remixAction.addEventListener("click", () => {
+      if (!pageId) return;
+      const u = new URL(window.location.href);
+      u.search = "";
+      u.searchParams.set("remix", pageId);
+      window.location.href = u.toString();
+    });
+
+    document.querySelectorAll("[data-template]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const key = btn.getAttribute("data-tpl");
+        const key = btn.getAttribute("data-template");
         const tpl = TEMPLATES[key];
         if (!tpl) return;
-        pageTitleInput.value = tpl.title;
-        codeEditor.value = tpl.code;
-        updatePreview();
-        setStatus(`「${tpl.title}」テンプレートを読み込みました。`);
+        setActiveTemplateChip(key);
+        titleField.value = tpl.title;
+        codeField.value = tpl.code;
+        renderPreview();
+        setBanner(`「${tpl.title}」を読み込みました。`, "info");
       });
     });
 
-    runBtn?.addEventListener("click", () => {
-      updatePreview();
-      setStatus("プレビューを更新しました。");
+    refreshPreviewBtn.addEventListener("click", () => {
+      renderPreview();
+      setBanner("プレビューを更新しました。", "info");
     });
 
-    let previewTimer = null;
-    codeEditor?.addEventListener("input", () => {
-      clearTimeout(previewTimer);
-      previewTimer = setTimeout(updatePreview, 250);
+    let debounceId = null;
+    codeField.addEventListener("input", () => {
+      clearTimeout(debounceId);
+      debounceId = setTimeout(renderPreview, 250);
     });
 
-    insertMediaBtn?.addEventListener("click", () => {
-      const file = mediaFileInput.files?.[0];
+    insertAssetBtn.addEventListener("click", () => {
+      const file = assetFileInput.files?.[0];
       if (!file) {
-        mediaHint.textContent = "先に画像または音声ファイルを選んでください。";
+        assetStatus.textContent = "先に画像または音声ファイルを選んでください。";
         return;
       }
-      if (file.size > 600 * 1024) {
-        mediaHint.textContent = "600KB以下のファイルがおすすめです（Firestoreの保存サイズ制限があるため）。";
+      if (file.size > 500 * 1024) {
+        assetStatus.textContent = "500KB以下のファイルがおすすめです（保存サイズが大きすぎると失敗することがあります）。";
       }
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = reader.result;
         if (file.type.startsWith("image/")) {
-          insertAtCursor(`\n<img src="${dataUrl}" alt="${file.name}" style="max-width:100%; border-radius:12px;" />\n`);
+          insertTextAtCursor(`\n<img src="${dataUrl}" alt="${file.name}" style="max-width:100%; border-radius:12px;" />\n`);
         } else if (file.type.startsWith("audio/")) {
-          insertAtCursor(`\n<audio controls src="${dataUrl}"></audio>\n`);
-        } else {
-          insertAtCursor(`\n<!-- ${file.name}: ${dataUrl} -->\n`);
+          insertTextAtCursor(`\n<audio controls src="${dataUrl}"></audio>\n`);
         }
-        mediaHint.textContent = `「${file.name}」を埋め込みました！`;
+        assetStatus.textContent = `「${file.name}」を挿入しました。`;
       };
       reader.readAsDataURL(file);
     });
 
-    publishBtn?.addEventListener("click", async () => {
-      const code = codeEditor.value.trim();
+    publishAction.addEventListener("click", async () => {
+      const code = codeField.value.trim();
       if (!code) {
-        setStatus("コードが空です。何か書いてから公開してください。", true);
+        setBanner("コードが空です。何か書いてから公開してください。", "err");
         return;
       }
 
-      publishBtn.disabled = true;
-      publishBtn.textContent = "公開中...";
-      setStatus("Firestoreに保存しています...");
+      publishAction.disabled = true;
+      publishAction.textContent = "公開中...";
+      setBanner("Firebaseに保存しています...", "info");
 
       try {
-        let shortId = generateShortId(6);
-        // 万が一のID重複チェック
+        let shortId = createShortId(6);
         for (let i = 0; i < 5; i++) {
-          const exists = await getDoc(doc(db, COLLECTION_NAME, shortId));
-          if (!exists.exists()) break;
-          shortId = generateShortId(6);
+          const snap = await getDoc(doc(db, COLLECTION, shortId));
+          if (!snap.exists()) break;
+          shortId = createShortId(6);
         }
 
-        const title = pageTitleInput.value.trim() || "無題のページ";
-        await setDoc(doc(db, COLLECTION_NAME, shortId), {
+        const title = titleField.value.trim() || "無題のページ";
+        await setDoc(doc(db, COLLECTION, shortId), {
           title,
           code,
           createdAt: serverTimestamp()
         });
 
-        const shareUrl = buildShareUrl(shortId);
-        shareUrlInput.value = shareUrl;
-        openPublishedLink.href = shareUrl;
-        shareBox.classList.add("show");
-        setStatus(`公開完了！短いURL（ID: ${shortId}）を発行しました。`);
+        const url = getShareUrl(shortId);
+        shareUrlField.value = url;
+        openPageLink.href = url;
+        publishCard.classList.add("show");
+        setBanner(`公開完了！短いURL（ID: ${shortId}）を発行しました。`, "ok");
       } catch (err) {
         console.error(err);
-        setStatus("公開に失敗しました。Firestoreのデータベース作成やテストモードの期限をご確認ください。", true);
+        setBanner("公開に失敗しました。Firestoreの設定や通信状況を確認してください。", "err");
       } finally {
-        publishBtn.disabled = false;
-        publishBtn.textContent = "🚀 短いURLで公開";
+        publishAction.disabled = false;
+        publishAction.textContent = "🚀 短いURLで公開";
       }
     });
 
-    copyUrlBtn?.addEventListener("click", async () => {
+    copyUrlAction.addEventListener("click", async () => {
+      const text = shareUrlField.value;
+      if (!text) return;
       try {
-        await navigator.clipboard.writeText(shareUrlInput.value);
-        copyUrlBtn.textContent = "コピーしました！";
+        await navigator.clipboard.writeText(text);
+        copyUrlAction.textContent = "コピー完了！";
         setTimeout(() => {
-          copyUrlBtn.textContent = "URLをコピー";
+          copyUrlAction.textContent = "URLをコピー";
         }, 1800);
       } catch {
-        shareUrlInput.select();
+        shareUrlField.select();
         document.execCommand("copy");
-        copyUrlBtn.textContent = "コピーしました！";
+        copyUrlAction.textContent = "コピー完了！";
         setTimeout(() => {
-          copyUrlBtn.textContent = "URLをコピー";
+          copyUrlAction.textContent = "URLをコピー";
         }, 1800);
       }
     });
 
     if (pageId) {
-      initViewer(pageId);
+      startViewer(pageId);
     } else {
-      initEditor();
+      startEditor();
     }
   </script>
 </body>
