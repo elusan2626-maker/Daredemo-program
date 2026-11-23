@@ -296,7 +296,6 @@
       font-size: 0.86rem;
       color: #334155;
     }
-    /* 独立したWebページ表示（誰プロのバー・装飾なし） */
     #viewerScreen {
       width: 100vw;
       height: 100dvh;
@@ -321,13 +320,16 @@
   </style>
 </head>
 <body>
-  <!-- 独立したWebページ表示モード（作成・修正UIや誰プロのバーなし） -->
   <div id="viewerScreen" class="hide">
     <div id="vStatus" class="status-only hide">読み込み中...</div>
-    <iframe id="vFrame" class="viewer-full hide" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+    <iframe
+      id="vFrame"
+      class="viewer-full hide"
+      allow="microphone; camera; autoplay"
+      sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
+    ></iframe>
   </div>
 
-  <!-- 作成・本人修正モード -->
   <div id="editorScreen" class="hide">
     <header>
       <div class="title-logo" id="editorHeaderTitle">✨ 誰プロ</div>
@@ -400,7 +402,12 @@
       </div>
 
       <div id="previewPanel" class="card hide">
-        <iframe id="previewIframe" class="stage" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+        <iframe
+          id="previewIframe"
+          class="stage"
+          allow="microphone; camera; autoplay"
+          sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
+        ></iframe>
       </div>
     </div>
   </div>
@@ -822,7 +829,6 @@
 
           const d = snap.data();
 
-          // 本人だけが持つ edit キーが一致した場合のみ修正モードへ
           if (editKeyParam && d.editKey && editKeyParam === d.editKey) {
             document.body.classList.remove("standalone-view");
             viewerScreen.classList.add("hide");
@@ -848,7 +854,6 @@
             return;
           }
 
-          // それ以外の人は独立したWebページとしてそのまま表示
           await showStandalonePage(pid, d);
           return;
         } catch (e) {
