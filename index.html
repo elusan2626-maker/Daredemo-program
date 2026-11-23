@@ -326,7 +326,6 @@
       id="vFrame"
       class="viewer-full hide"
       allow="microphone; camera; autoplay"
-      sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
     ></iframe>
   </div>
 
@@ -406,7 +405,7 @@
           id="previewIframe"
           class="stage"
           allow="microphone; camera; autoplay"
-          sandbox="allow-scripts allow-forms allow-modals allow-popups allow-same-origin"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"
         ></iframe>
       </div>
     </div>
@@ -503,6 +502,8 @@
     let activeEditKey = null;
     let isOwnerEditing = false;
 
+    const blobUrlMap = new WeakMap();
+
     const viewerScreen = document.getElementById("viewerScreen");
     const editorScreen = document.getElementById("editorScreen");
     const editorHeaderTitle = document.getElementById("editorHeaderTitle");
@@ -534,6 +535,18 @@
     const fileNote = document.getElementById("fileNote");
 
     function setMsg(t) { msgBox.textContent = t; }
+
+    function setFrameHtmlViaBlob(iframeEl, htmlString) {
+      const prevUrl = blobUrlMap.get(iframeEl);
+      if (prevUrl) {
+        URL.revokeObjectURL(prevUrl);
+        blobUrlMap.delete(iframeEl);
+      }
+      const blob = new Blob([htmlString], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      blobUrlMap.set(iframeEl, url);
+      iframeEl.src = url;
+    }
 
     function buildViewUrl(id) {
       const u = new URL(location.href);
@@ -634,7 +647,7 @@
 
     function updateView() {
       const room = activePageId ? "page_" + activePageId : "preview_draft";
-      previewIframe.srcdoc = buildRuntimeHtml(codeInput.value, room);
+      setFrameHtmlViaBlob(previewIframe, buildRuntimeHtml(codeInput.value, room));
     }
 
     function switchTab(mode) {
@@ -809,7 +822,7 @@
       vStatus.classList.add("hide");
       vFrame.classList.remove("hide");
       document.title = data.title || "無題";
-      vFrame.srcdoc = buildRuntimeHtml(data.code, "page_" + pageId);
+      setFrameHtmlViaBlob(vFrame, buildRuntimeHtml(data.code, "page_" + pageId));
     }
 
     async function init() {
