@@ -573,6 +573,7 @@
   const sdkPromise = import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js")
     .then(async ({ initializeApp, getApps }) => {
       const { getDatabase, ref, set, update, push, get, onValue, remove } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js");
+      const { getAuth, signInAnonymously } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
       const cfg = {
         apiKey: "AIzaSyDMFcak07d3Yv1OCrWS-Src_EELS-k61PE",
         authDomain: "darepro-app.firebaseapp.com",
@@ -580,6 +581,10 @@
         projectId: "darepro-app"
       };
       const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+      const auth = getAuth(app);
+      if (!auth.currentUser) {
+        await signInAnonymously(auth);
+      }
       const rtdb = getDatabase(app);
       return { rtdb, ref, set, update, push, get, onValue, remove };
     });
